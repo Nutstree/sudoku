@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Cell {
 
+    public static final String INVALID_VALUE = "Invalid value: ";
     private Integer value;
     private Set<Integer> possibilities;
 
@@ -15,7 +16,6 @@ public class Cell {
 
     public Cell(int value) {
         validateValue(value);
-        Validate.exclusiveBetween(0, 10, value);
         this.value = value;
         this.possibilities = Collections.emptySet();
     }
@@ -35,6 +35,6 @@ public class Cell {
     }
 
     private void validateValue(int value) {
-        Validate.exclusiveBetween(0, 10, value);
+        Validate.inclusiveBetween(1, 9, value, INVALID_VALUE + value);
     }
 }
