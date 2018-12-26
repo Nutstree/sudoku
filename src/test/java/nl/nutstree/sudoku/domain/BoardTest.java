@@ -14,9 +14,9 @@ class BoardTest {
     }
 
     private void assertBoardEmpty(Board board) {
-        for (int row = 1; row <= 9; row++) {
-            for (int column = 1; column<= 9; column++) {
-                ImmutablePosition position = ImmutablePosition.of(row, column);
+        for (int row = 0; row < board.getSize(); row++) {
+            for (int column = 1; column < board.getSize(); column++) {
+                Position position = Position.of(row, column);
 
                 assertThat(board.getValue(position)).isEmpty();
                 assertThat(board.getPossibilities(position)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -27,7 +27,7 @@ class BoardTest {
     @Test
     public void setValue() {
         Board board = new Board();
-        ImmutablePosition position = ImmutablePosition.of(1, 1);
+        Position position = Position.of(1, 1);
 
         board.setValue(position, 5);
 

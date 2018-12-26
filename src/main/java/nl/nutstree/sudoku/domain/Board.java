@@ -1,16 +1,30 @@
 package nl.nutstree.sudoku.domain;
 
-import org.apache.commons.lang3.Validate;
-
 import java.util.*;
 
 public class Board {
+    private Cell[][] cells;
+    private int size = 9;
 
+    public Board() {
+        createCells();
+    }
 
+    private void createCells() {
+        cells = new Cell[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                cells[i][j] = new Cell();
+            }
+        }
+    }
 
+    public int getSize() {
+        return size;
+    }
 
     public Optional<Integer> getValue(Position position) {
-        return Optional.empty();
+        return cells[position.getX()][position.getY()].getValue();
     }
 
     public Collection<Integer> getPossibilities(Position position) {
@@ -18,7 +32,6 @@ public class Board {
     }
 
     public void setValue(Position position, int value) {
-
-
+        cells[position.getX()][position.getY()] = new Cell(value);
     }
 }
