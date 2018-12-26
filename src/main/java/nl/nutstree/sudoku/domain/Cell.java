@@ -8,15 +8,24 @@ public class Cell {
 
     public static final String INVALID_VALUE = "Invalid value: ";
     private Integer value;
+    private Position position;
     private Set<Integer> possibilities;
 
-    public Cell() {
+    public Cell(Position position) {
+        this.position = position;
         this.possibilities = new HashSet<>(Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9}));
     }
 
-    public Cell(int value) {
+    Cell(Set<Integer> possibilities, Position position) {
+        validateValues(possibilities);
+        this.position = position;
+        this.possibilities = possibilities;
+    }
+
+    public Cell(int value, Position position) {
         validateValue(value);
         this.value = value;
+        this.position = position;
         this.possibilities = Collections.emptySet();
     }
 
@@ -36,5 +45,33 @@ public class Cell {
 
     private void validateValue(int value) {
         Validate.inclusiveBetween(1, 9, value, INVALID_VALUE + value);
+    }
+
+    private void validateValues(Collection<Integer> values) {
+        values.stream().forEach(this::validateValue);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return Objects.equals(value, cell.value) &&
+                Objects.equals(position, cell.position) &&
+                Objects.equals(possibilities, cell.possibilities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, position, possibilities);
+    }
+
+    @Override
+    public String toString() {
+        return "Cell{" +
+                "value=" + value +
+                ", position=" + position +
+                ", possibilities=" + possibilities +
+                '}';
     }
 }
