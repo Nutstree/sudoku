@@ -6,7 +6,8 @@ import java.util.*;
 
 public class Cell {
 
-    public static final String INVALID_VALUE = "Invalid value: ";
+    static final String INVALID_VALUE = "Invalid value: ";
+    static final String INVALID_POSSIBILITY = "Invalid possibility: ";
     private Integer value;
     private Position position;
     private Set<Integer> possibilities;
@@ -17,7 +18,7 @@ public class Cell {
     }
 
     Cell(Set<Integer> possibilities, Position position) {
-        validateValues(possibilities);
+        validatePossibilities(possibilities);
         this.position = position;
         this.possibilities = possibilities;
     }
@@ -47,8 +48,9 @@ public class Cell {
         Validate.inclusiveBetween(1, 9, value, INVALID_VALUE + value);
     }
 
-    private void validateValues(Collection<Integer> values) {
-        values.stream().forEach(this::validateValue);
+    private void validatePossibilities(Set<Integer> values) {
+        values.stream()
+            .forEach(i -> Validate.inclusiveBetween(1, 9, i, INVALID_POSSIBILITY + values));
     }
 
     @Override
