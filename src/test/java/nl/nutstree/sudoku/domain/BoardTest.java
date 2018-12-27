@@ -1,12 +1,9 @@
 package nl.nutstree.sudoku.domain;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -71,24 +68,39 @@ class BoardTest {
     public void afterSettingValueOnPosition_relatedCellsPossibilityAdjusted() {
         board.setValue(5, position);
 
-        assertXDoesNotContainPossibility(5, position);
-        assertYDoesNotContainPossibility(5, position);
+        assertRowDoesNotContainPossibility(5, position);
+        assertColumnDoesNotContainPossibility(5, position);
         //TODO assert Quadrant does not contain possibility
-        //assertQDoesNotContainPossibility(5, position);
+        assertQDoesNotContainPossibility(5, position);
     }
 
-    private void assertXDoesNotContainPossibility(int value, Position position) {
+    private void assertRowDoesNotContainPossibility(int value, Position position) {
         IntStream.range(0, 9)
                 .filter(i -> position.getY() != i)
                 .mapToObj(y -> Position.of(position.getX(), y))
                 .forEach(pos -> assertValueNotAPossibilityAtPosition(value, pos));
     }
 
-    private void assertYDoesNotContainPossibility(int value, Position position) {
+    private void assertColumnDoesNotContainPossibility(int value, Position position) {
         IntStream.range(0, 9)
                 .filter(i -> position.getX() != i)
                 .mapToObj(x -> Position.of(x, position.getY()))
                 .forEach(pos -> assertValueNotAPossibilityAtPosition(value, pos));
+    }
+
+    private void assertQDoesNotContainPossibility(int possibility, Position position) {
+        Collection<Cell> cellsInQuadrant = board.getCellsInQuadrant(position);
+
+        assertCollectionDoesNotContainPossibility(cellsInQuadrant, possibility);
+    }
+
+    private void assertCollectionDoesNotContainPossibility(Collection<Cell> cellsInQuadrant, int possibility) {
+        cellsInQuadrant.stream()
+                .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
+    }
+
+    private void assertPossiblityNotInCell(Cell cell, int possibility) {
+        assertThat(cell.getPossibilities()).doesNotContain(possibility);
     }
 
     private void assertValueNotAPossibilityAtPosition(int value, Position position) {

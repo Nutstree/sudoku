@@ -14,6 +14,10 @@ abstract class AbstractPosition {
     @Value.Parameter
     abstract int getY();
 
+    public int getQuadrant() {
+        return ((getY() / 3) * 3) + (getX() / 3);
+    }
+
     @Value.Check
     void check() {
         Validate.inclusiveBetween(0, 8, getX(), ILLEGAL_X + getX());
