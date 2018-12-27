@@ -16,7 +16,7 @@ abstract class AbstractCell {
     static final String INVALID_POSSIBILITY = "Invalid possibility: ";
 
     abstract Optional<Integer> getValue();
-    abstract Position getPosition();
+    abstract Location getLocation();
 
     @Value.Default
     public Set<Integer> getPossibilities() {

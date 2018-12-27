@@ -14,12 +14,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BoardTest {
 
     private Board board;
-    private Position position;
+    private Location location;
 
     @BeforeEach
     public void setUp() {
         board = new Board();
-        position = Position.of(0, 0);
+        location = Location.of(0, 0);
 
     }
 
@@ -31,23 +31,23 @@ class BoardTest {
     private void assertBoardEmpty(Board board) {
         for (int row = 0; row < board.getSize(); row++) {
             for (int column = 1; column < board.getSize(); column++) {
-                Position position = Position.of(row, column);
+                Location location = Location.of(row, column);
 
-                assertThat(board.getValue(position)).isEmpty();
-                assertThat(board.getPossibilities(position)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
+                assertThat(board.getValue(location)).isEmpty();
+                assertThat(board.getPossibilities(location)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
             }
         }
     }
 
     @Test
     public void setIllegalValues_throwsExeption() {
-        assertThatThrownBy(() -> board.setValue(0, position))
+        assertThatThrownBy(() -> board.setValue(0, location))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> board.setValue(-1, position))
+        assertThatThrownBy(() -> board.setValue(-1, location))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> board.setValue(10, position))
+        assertThatThrownBy(() -> board.setValue(10, location))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -58,38 +58,38 @@ class BoardTest {
     }
 
     private void assertSetValueCorrect(int value) {
-        board.setValue(value, position);
+        board.setValue(value, location);
 
-        assertThat(board.getValue(position)).contains(value);
-        assertThat(board.getPossibilities(position)).isEmpty();
+        assertThat(board.getValue(location)).contains(value);
+        assertThat(board.getPossibilities(location)).isEmpty();
     }
 
     @Test
-    public void afterSettingValueOnPosition_relatedCellsPossibilityAdjusted() {
-        board.setValue(5, position);
+    public void afterSettingValueOnlocation_relatedCellsPossibilityAdjusted() {
+        board.setValue(5, location);
 
-        assertRowDoesNotContainPossibility(5, position);
-        assertColumnDoesNotContainPossibility(5, position);
+        assertRowDoesNotContainPossibility(5, location);
+        assertColumnDoesNotContainPossibility(5, location);
         //TODO assert Quadrant does not contain possibility
-        assertQDoesNotContainPossibility(5, position);
+        assertQDoesNotContainPossibility(5, location);
     }
 
-    private void assertRowDoesNotContainPossibility(int value, Position position) {
+    private void assertRowDoesNotContainPossibility(int value, Location location) {
         IntStream.range(0, 9)
-                .filter(i -> position.getY() != i)
-                .mapToObj(y -> Position.of(position.getX(), y))
-                .forEach(pos -> assertValueNotAPossibilityAtPosition(value, pos));
+                .filter(i -> location.getY() != i)
+                .mapToObj(y -> Location.of(location.getX(), y))
+                .forEach(pos -> assertValueNotAPossibilityAtlocation(value, pos));
     }
 
-    private void assertColumnDoesNotContainPossibility(int value, Position position) {
+    private void assertColumnDoesNotContainPossibility(int value, Location location) {
         IntStream.range(0, 9)
-                .filter(i -> position.getX() != i)
-                .mapToObj(x -> Position.of(x, position.getY()))
-                .forEach(pos -> assertValueNotAPossibilityAtPosition(value, pos));
+                .filter(i -> location.getX() != i)
+                .mapToObj(x -> Location.of(x, location.getY()))
+                .forEach(pos -> assertValueNotAPossibilityAtlocation(value, pos));
     }
 
-    private void assertQDoesNotContainPossibility(int possibility, Position position) {
-        Collection<Cell> cellsInQuadrant = board.getCellsInQuadrant(position);
+    private void assertQDoesNotContainPossibility(int possibility, Location location) {
+        Collection<Cell> cellsInQuadrant = board.getCellsInQuadrant(location);
 
         assertCollectionDoesNotContainPossibility(cellsInQuadrant, possibility);
     }
@@ -103,10 +103,10 @@ class BoardTest {
         assertThat(cell.getPossibilities()).doesNotContain(possibility);
     }
 
-    private void assertValueNotAPossibilityAtPosition(int value, Position position) {
-        Cell cell = board.getCell(position);
+    private void assertValueNotAPossibilityAtlocation(int value, Location location) {
+        Cell cell = board.getCell(location);
         Cell expected = new Cell.Builder()
-                .position(position)
+                .location(location)
                 .possibilities(generateNumberSetWithout(value))
                 .build();
 

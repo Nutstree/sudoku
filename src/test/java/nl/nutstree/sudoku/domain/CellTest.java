@@ -12,11 +12,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class CellTest {
 
-    private Position dummyPosition;
+    private Location dummylocation;
 
     @BeforeEach
     public void setUp() {
-        dummyPosition = dummyPosition.of(1, 1);
+        dummylocation = dummylocation.of(1, 1);
     }
 
     @Test
@@ -70,14 +70,14 @@ public class CellTest {
 
     private Cell createEmptyCell() {
         return new Cell.Builder()
-                .position(dummyPosition)
+                .location(dummylocation)
                 .build();
     }
 
     private Cell createCellWithValue(int value) {
         return new Cell.Builder()
                 .value(value)
-                .position(dummyPosition)
+                .location(dummylocation)
                 .build();
     }
 }

@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Board {
-    private Map<Position, Cell> cellMap;
+    private Map<Location, Cell> cellMap;
     private int size = 9;
 
     public Board() {
@@ -16,12 +16,12 @@ public class Board {
         cellMap = new LinkedHashMap<>();
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                Position position = Position.of(x, y);
+                Location location = Location.of(x, y);
                 Cell cell = new Cell.Builder()
-                        .position(position)
+                        .location(location)
                         .build();
 
-                cellMap.put(position, cell);
+                cellMap.put(location, cell);
             }
         }
     }
@@ -30,62 +30,62 @@ public class Board {
         return size;
     }
 
-    public Optional<Integer> getValue(Position position) {
-        return cellMap.get(position).getValue();
+    public Optional<Integer> getValue(Location location) {
+        return cellMap.get(location).getValue();
     }
 
-    public Collection<Integer> getPossibilities(Position position) {
-        return cellMap.get(position).getPossibilities();
+    public Collection<Integer> getPossibilities(Location location) {
+        return cellMap.get(location).getPossibilities();
     }
 
-    public void setValue(int value, Position position) {
-        Cell oldCell = cellMap.get(position);
+    public void setValue(int value, Location location) {
+        Cell oldCell = cellMap.get(location);
         Cell newCell = oldCell.withValue(value).withPossibilities();
 
-        cellMap.put(position, newCell);
+        cellMap.put(location, newCell);
 
-        removePossibilityFromX(value, position.getX());
-        removePossibilityFromY(value, position.getY());
-        removePossibilityFromQ(value, position);
+        removePossibilityFromX(value, location.getX());
+        removePossibilityFromY(value, location.getY());
+        removePossibilityFromQ(value, location);
     }
 
     private void removePossibilityFromX(int value, int x) {
         IntStream.range(0, 9)
-                .mapToObj(y -> Position.of(x, y))
-                .forEach(position -> removePossibility(value, position));
+                .mapToObj(y -> Location.of(x, y))
+                .forEach(location -> removePossibility(value, location));
     }
 
     private void removePossibilityFromY(int value, int y) {
         IntStream.range(0, 9)
-                .mapToObj(x -> Position.of(x, y))
-                .forEach(position -> removePossibility(value, position));
+                .mapToObj(x -> Location.of(x, y))
+                .forEach(location -> removePossibility(value, location));
     }
 
-    private void removePossibilityFromQ(int value, Position position) {
-        Collection<Cell> cellsInQuadrant = getCellsInQuadrant(position);
+    private void removePossibilityFromQ(int value, Location location) {
+        Collection<Cell> cellsInQuadrant = getCellsInQuadrant(location);
 
         cellsInQuadrant.stream()
-                .map(cell -> cell.getPosition())
+                .map(cell -> cell.getLocation())
                 .forEach(pos -> removePossibility(value, pos));
     }
 
-    public void removePossibility(int possibility, Position position) {
-        Cell cell = cellMap.get(position);
+    public void removePossibility(int possibility, Location location) {
+        Cell cell = cellMap.get(location);
         Set<Integer> possibilities = new HashSet<>(cell.getPossibilities());
 
         possibilities.remove(possibility);
         Cell newCell = cell.withPossibilities(possibilities);
 
-        cellMap.put(position, newCell);
+        cellMap.put(location, newCell);
     }
 
-    Cell getCell(Position position) {
-        return cellMap.get(position);
+    Cell getCell(Location location) {
+        return cellMap.get(location);
     }
 
 
-    public Collection<Cell> getCellsInQuadrant(Position position) {
-        int quadrant = position.getQuadrant();
+    public Collection<Cell> getCellsInQuadrant(Location location) {
+        int quadrant = location.getQuadrant();
         return cellMap.entrySet().stream()
                 .filter(e -> e.getKey().getQuadrant() == quadrant)
                 .map(e -> e.getValue())

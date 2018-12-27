@@ -4,7 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.immutables.value.Value;
 
 @Value.Immutable
-abstract class AbstractPosition {
+abstract class AbstractLocation {
 
     static String ILLEGAL_X = "Illegal X argument: ";
     static String ILLEGAL_Y = "Illegal Y argument: ";
