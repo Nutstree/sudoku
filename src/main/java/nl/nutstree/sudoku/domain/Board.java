@@ -69,7 +69,7 @@ public class Board {
                 .forEach(pos -> removePossibility(value, pos));
     }
 
-    public void removePossibility(int possibility, Location location) {
+    private void removePossibility(int possibility, Location location) {
         Cell cell = cellMap.get(location);
         Set<Integer> possibilities = new HashSet<>(cell.getPossibilities());
 

@@ -12,12 +12,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BoardTest {
 
     private Board board;
-    private Location location;
+//    private Location location;
 
     @BeforeEach
     public void setUp() {
         board = new Board();
-        location = Location.of(0, 0);
+//        location = Location.of(0, 0);
 
     }
 
@@ -39,13 +39,13 @@ class BoardTest {
 
     @Test
     public void setIllegalValues_throwsExeption() {
-        assertThatThrownBy(() -> board.setValue(0, location))
+        assertThatThrownBy(() -> board.setValue(0, Location.of(0, 0)))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> board.setValue(-1, location))
+        assertThatThrownBy(() -> board.setValue(-1, Location.of(2, 8)))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> board.setValue(10, location))
+        assertThatThrownBy(() -> board.setValue(10, Location.of(4, 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -56,6 +56,7 @@ class BoardTest {
     }
 
     private void assertSetValueCorrect(int value) {
+        Location location = Location.of(6, 6);
         board.setValue(value, location);
 
         assertThat(board.getValue(location)).contains(value);
@@ -64,6 +65,7 @@ class BoardTest {
 
     @Test
     public void afterSettingValueOnlocation_relatedCellsPossibilityAdjusted() {
+        Location location = Location.of(7, 7);
         board.setValue(5, location);
 
         assertRowDoesNotContainPossibility(5, location);
@@ -92,6 +94,42 @@ class BoardTest {
 
     private void assertPossiblityNotInCell(Cell cell, int possibility) {
         assertThat(cell.getPossibilities()).doesNotContain(possibility);
+    }
+
+    @Test
+    public void getCellsInRow() {
+        board.getCellsInRow(0).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getX()).isEqualTo(0));
+        board.getCellsInRow(5).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getX()).isEqualTo(5));
+        board.getCellsInRow(8).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getX()).isEqualTo(8));
+    }
+
+    @Test
+    public void getCellsInColumn() {
+        board.getCellsInColumn(1).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getY()).isEqualTo(1));
+        board.getCellsInColumn(4).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getY()).isEqualTo(4));
+        board.getCellsInColumn(7).stream()
+                .forEach(cell -> assertThat(cell.getLocation().getY()).isEqualTo(7));
+    }
+
+    @Test
+    public void getCellsInQuadrant() {
+        assertgetCellsInQuadrant(Location.of(4, 5));
+        assertgetCellsInQuadrant(Location.of(6, 1));
+        assertgetCellsInQuadrant(Location.of(0, 2));
+    }
+
+    private void assertgetCellsInQuadrant(Location location) {
+        int expectedQuadrant = location.getQuadrant();
+
+        board.getCellsInQuadrant(location).stream()
+                .map(Cell::getLocation)
+                .map(Location::getQuadrant)
+                .forEach(result -> assertThat(result).isEqualTo(expectedQuadrant));
     }
 
 }
