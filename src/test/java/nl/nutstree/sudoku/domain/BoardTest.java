@@ -12,13 +12,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BoardTest {
 
     private Board board;
-//    private Location location;
 
     @BeforeEach
     public void setUp() {
         board = new Board();
-//        location = Location.of(0, 0);
-
     }
 
     @Test
