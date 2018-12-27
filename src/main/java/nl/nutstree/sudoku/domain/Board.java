@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Board {
-    private Cell[][] cells;
-    private Map<Position, Cell> cellMap = new LinkedHashMap<>();
+    private Map<Position, Cell> cellMap;
     private int size = 9;
 
     public Board() {
@@ -14,7 +13,7 @@ public class Board {
     }
 
     private void createEmptyBoard() {
-        cells = new Cell[size][size];
+        cellMap = new LinkedHashMap<>();
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 Position position = Position.of(x, y);
@@ -22,7 +21,6 @@ public class Board {
                         .position(position)
                         .build();
 
-                cells[x][y] = cell;
                 cellMap.put(position, cell);
             }
         }
@@ -33,18 +31,18 @@ public class Board {
     }
 
     public Optional<Integer> getValue(Position position) {
-        return cells[position.getX()][position.getY()].getValue();
+        return cellMap.get(position).getValue();
     }
 
     public Collection<Integer> getPossibilities(Position position) {
-        return cells[position.getX()][position.getY()].getPossibilities();
+        return cellMap.get(position).getPossibilities();
     }
 
     public void setValue(int value, Position position) {
-        Cell oldCell = cells[position.getX()][position.getY()];
+        Cell oldCell = cellMap.get(position);
         Cell newCell = oldCell.withValue(value).withPossibilities();
 
-        cells[position.getX()][position.getY()] = newCell;
+        cellMap.put(position, newCell);
 
         removePossibilityFromX(value, position.getX());
         removePossibilityFromY(value, position.getY());
@@ -72,18 +70,17 @@ public class Board {
     }
 
     public void removePossibility(int possibility, Position position) {
-        Cell cell = cells[position.getX()][position.getY()];
+        Cell cell = cellMap.get(position);
         Set<Integer> possibilities = new HashSet<>(cell.getPossibilities());
 
         possibilities.remove(possibility);
         Cell newCell = cell.withPossibilities(possibilities);
 
-        cells[position.getX()][position.getY()] = newCell;
         cellMap.put(position, newCell);
     }
 
     Cell getCell(Position position) {
-        return cells[position.getX()][position.getY()];
+        return cellMap.get(position);
     }
 
 
