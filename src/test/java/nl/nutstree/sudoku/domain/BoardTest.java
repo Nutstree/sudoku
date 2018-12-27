@@ -3,6 +3,7 @@ package nl.nutstree.sudoku.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,17 +72,21 @@ class BoardTest {
     }
 
     private void assertRowDoesNotContainPossibility(int possibility, Location location) {
-        board.getCellsInRow(location.getX()).stream()
-                .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
+        assertCellsDoNotContainPossibility(board.getCellsInRow(location.getX()), possibility);
     }
 
     private void assertColumnDoesNotContainPossibility(int possibility, Location location) {
-        board.getCellsInColumn(location.getY()).stream()
-                .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
+        assertCellsDoNotContainPossibility(board.getCellsInColumn(location.getY()), possibility);
+
     }
 
     private void assertQuadrantDoesNotContainPossibility(int possibility, Location location) {
-        board.getCellsInQuadrant(location).stream()
+        assertCellsDoNotContainPossibility(board.getCellsInQuadrant(location), possibility);
+
+    }
+
+    private void assertCellsDoNotContainPossibility(Collection<Cell> cells, int possibility) {
+        cells.stream()
                 .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
     }
 
