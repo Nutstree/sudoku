@@ -5,29 +5,62 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Board {
-    private Map<Location, Cell> cellMap;
-    private int size = 9;
+    private final Map<Location, Cell> cellMap;
+    private static final int SIZE = 9;
 
     public Board() {
-        createEmptyBoard();
+        cellMap = new LinkedHashMap<>();
+        fillBoardWithEmptyCells();
     }
 
-    private void createEmptyBoard() {
+    public Board(String board) {
         cellMap = new LinkedHashMap<>();
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
+        fillBoard(board);
+    }
+
+    private void fillBoardWithEmptyCells() {
+        String emptyPuzzle = createEmptyPuzzleString();
+        fillBoard(emptyPuzzle);
+    }
+
+    private String createEmptyPuzzleString() {
+        return IntStream.range(0, SIZE * SIZE)
+                .mapToObj(i -> "0")
+                .collect(Collectors.joining());
+    }
+
+    private void fillBoard(String puzzle) {
+        for (int x = 0; x < SIZE; x++) {
+            for (int y = 0; y < SIZE; y++) {
                 Location location = Location.of(x, y);
-                Cell cell = new Cell.Builder()
-                        .location(location)
-                        .build();
+                int value = getValue(puzzle, x + (y * SIZE));
+
+                Cell cell = value == 0 ? createEmptyCell(location) : createCell(value, location);
 
                 cellMap.put(location, cell);
             }
         }
     }
 
+    private int getValue(String puzzle, int stringPosition) {
+        return Integer.valueOf(puzzle.substring(stringPosition, stringPosition + 1));
+    }
+
+    private Cell createEmptyCell(Location location) {
+        return new Cell.Builder()
+                .location(location)
+                .build();
+    }
+
+    private Cell createCell(int value, Location location) {
+        return new Cell.Builder()
+                .value(value)
+                .location(location)
+                .build();
+    }
+
     public int getSize() {
-        return size;
+        return SIZE;
     }
 
     public Optional<Integer> getValue(Location location) {
