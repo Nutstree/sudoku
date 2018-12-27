@@ -93,7 +93,10 @@ class BoardTest {
 
     private void assertValueNotAPossibilityAtPosition(int value, Position position) {
         Cell cell = board.getCell(position);
-        Cell expected = new Cell(generateNumberSetWithout(value), position);
+        Cell expected = new Cell.Builder()
+                .position(position)
+                .possibilities(generateNumberSetWithout(value))
+                .build();
 
         assertThat(cell).isEqualTo(expected);
         assertThat(cell.getPossibilities()).doesNotContain(value);

@@ -15,7 +15,9 @@ public class Board {
         cells = new Cell[size][size];
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                cells[x][y] = new Cell(Position.of(x, y));
+                cells[x][y] = new Cell.Builder()
+                .position(Position.of(x, y))
+                .build();
             }
         }
     }
@@ -33,8 +35,11 @@ public class Board {
     }
 
     public void setValue(int value, Position position) {
-        //TODO: cell should become an immutable...
-        cells[position.getX()][position.getY()] = new Cell(value, position);
+        Cell oldCell = cells[position.getX()][position.getY()];
+        Cell newCell = oldCell.withValue(value).withPossibilities();
+
+        cells[position.getX()][position.getY()] = newCell;
+
         removePossibilityFromX(value, position.getX());
         removePossibilityFromY(value, position.getY());
     }
@@ -52,7 +57,13 @@ public class Board {
     }
 
     public void removePossibility(int value, Position position) {
-        cells[position.getX()][position.getY()].removePossibility(value);
+        Cell cell = cells[position.getX()][position.getY()];
+        Set<Integer> possibilities = new HashSet<>(cell.getPossibilities());
+
+        possibilities.remove(value);
+        Cell newCell = cell.withPossibilities(possibilities);
+
+        cells[position.getX()][position.getY()] = newCell;
     }
 
     Cell getCell(Position position) {

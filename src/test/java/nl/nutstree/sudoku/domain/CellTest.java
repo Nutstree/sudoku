@@ -3,6 +3,7 @@ package nl.nutstree.sudoku.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,60 +12,72 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class CellTest {
 
-    private Position position;
+    private Position dummyPosition;
 
     @BeforeEach
     public void setUp() {
-        position.of(1, 1);
+        dummyPosition = dummyPosition.of(1, 1);
     }
 
     @Test
     public void emptyCreation() {
-        Cell cell = new Cell(position);
+        Cell emptyCell = createEmptyCell();
+        Set<Integer> expectedPossibilities = Cell.getDefaultPossibilities(9);
 
-        assertThat(cell.getPossibilities()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        assertThat(cell.getValue()).isEmpty();
+        Set<Integer> result = emptyCell.getPossibilities();
+
+        assertThat(result).isEqualTo(expectedPossibilities);
+    }
+
+    @Test
+    public void defaultPossibilities() {
+        Set<Integer> result = Cell.getDefaultPossibilities(9);
+
+        assertThat(result).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
     }
 
     @Test
     public void negativeValue() {
-        assertThatThrownBy(() -> new Cell(-1, position))
+        assertThatThrownBy(() -> createCellWithValue(-1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void zeroValue() {
-        assertThatThrownBy(() -> new Cell(0, position))
+        assertThatThrownBy(() -> createCellWithValue(0))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void tooBigValue() {
-        assertThatThrownBy(() -> new Cell(10, position))
+        assertThatThrownBy(() -> createCellWithValue(10))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void validValues() {
         IntStream.rangeClosed(1, 9)
-                .forEach(value -> assertCellIsValid(new Cell(value, position), value));
+                .forEach(this::assertValueCreatesValidCell);
+
     }
 
-    private void assertCellIsValid(Cell cell, int value) {
-        assertThat(cell.getValue()).contains(value);
-        assertThat(cell.getPossibilities()).isEmpty();
+    private void assertValueCreatesValidCell(int value) {
+        Cell result = createCellWithValue(value);
+
+        assertThat(result.getValue()).contains(value);
+        assertThat(result.getPossibilities()).isEmpty();
     }
 
-    @Test
-    public void removePossibility() {
-        Cell cell = new Cell(position);
-
-        cell.removePossibility(5);
-
-        assertThat(cell.getPossibilities()).containsExactly(1, 2, 3, 4, 6, 7, 8, 9);
-        assertThat(cell.getPossibilities()).doesNotContain(5);
+    private Cell createEmptyCell() {
+        return new Cell.Builder()
+                .position(dummyPosition)
+                .build();
     }
 
-
-
+    private Cell createCellWithValue(int value) {
+        return new Cell.Builder()
+                .value(value)
+                .position(dummyPosition)
+                .build();
+    }
 }
