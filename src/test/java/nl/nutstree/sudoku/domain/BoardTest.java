@@ -3,9 +3,6 @@ package nl.nutstree.sudoku.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,57 +67,26 @@ class BoardTest {
 
         assertRowDoesNotContainPossibility(5, location);
         assertColumnDoesNotContainPossibility(5, location);
-        //TODO assert Quadrant does not contain possibility
-        assertQDoesNotContainPossibility(5, location);
+        assertQuadrantDoesNotContainPossibility(5, location);
     }
 
-    private void assertRowDoesNotContainPossibility(int value, Location location) {
-        IntStream.range(0, 9)
-                .filter(i -> location.getY() != i)
-                .mapToObj(y -> Location.of(location.getX(), y))
-                .forEach(pos -> assertValueNotAPossibilityAtlocation(value, pos));
+    private void assertRowDoesNotContainPossibility(int possibility, Location location) {
+        board.getCellsInRow(location.getX()).stream()
+                .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
     }
 
-    private void assertColumnDoesNotContainPossibility(int value, Location location) {
-        IntStream.range(0, 9)
-                .filter(i -> location.getX() != i)
-                .mapToObj(x -> Location.of(x, location.getY()))
-                .forEach(pos -> assertValueNotAPossibilityAtlocation(value, pos));
+    private void assertColumnDoesNotContainPossibility(int possibility, Location location) {
+        board.getCellsInColumn(location.getY()).stream()
+                .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
     }
 
-    private void assertQDoesNotContainPossibility(int possibility, Location location) {
-        Collection<Cell> cellsInQuadrant = board.getCellsInQuadrant(location);
-
-        assertCollectionDoesNotContainPossibility(cellsInQuadrant, possibility);
-    }
-
-    private void assertCollectionDoesNotContainPossibility(Collection<Cell> cellsInQuadrant, int possibility) {
-        cellsInQuadrant.stream()
+    private void assertQuadrantDoesNotContainPossibility(int possibility, Location location) {
+        board.getCellsInQuadrant(location).stream()
                 .forEach(cell -> assertPossiblityNotInCell(cell, possibility));
     }
 
     private void assertPossiblityNotInCell(Cell cell, int possibility) {
         assertThat(cell.getPossibilities()).doesNotContain(possibility);
     }
-
-    private void assertValueNotAPossibilityAtlocation(int value, Location location) {
-        Cell cell = board.getCell(location);
-        Cell expected = new Cell.Builder()
-                .location(location)
-                .possibilities(generateNumberSetWithout(value))
-                .build();
-
-        assertThat(cell).isEqualTo(expected);
-        assertThat(cell.getPossibilities()).doesNotContain(value);
-        assertThat(cell.getPossibilities()).hasSize(8);
-    }
-
-    private Set<Integer> generateNumberSetWithout(int value) {
-        return IntStream.rangeClosed(1, 9)
-                .filter(i -> value != i)
-                .boxed()
-                .collect(Collectors.toSet());
-    }
-
 
 }

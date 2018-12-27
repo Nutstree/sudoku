@@ -65,7 +65,7 @@ public class Board {
         Collection<Cell> cellsInQuadrant = getCellsInQuadrant(location);
 
         cellsInQuadrant.stream()
-                .map(cell -> cell.getLocation())
+                .map(Cell::getLocation)
                 .forEach(pos -> removePossibility(value, pos));
     }
 
@@ -79,16 +79,25 @@ public class Board {
         cellMap.put(location, newCell);
     }
 
-    Cell getCell(Location location) {
-        return cellMap.get(location);
-    }
-
-
     public Collection<Cell> getCellsInQuadrant(Location location) {
         int quadrant = location.getQuadrant();
         return cellMap.entrySet().stream()
                 .filter(e -> e.getKey().getQuadrant() == quadrant)
-                .map(e -> e.getValue())
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
+    }
+
+    public Collection<Cell> getCellsInRow(int x) {
+        return cellMap.entrySet().stream()
+                .filter(e -> e.getKey().getX() == x)
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
+    }
+
+    public Collection<Cell> getCellsInColumn(int y) {
+        return cellMap.entrySet().stream()
+                .filter(e -> e.getKey().getY() == y)
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
     }
 }
