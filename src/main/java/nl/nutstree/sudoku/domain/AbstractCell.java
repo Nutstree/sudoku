@@ -15,8 +15,9 @@ abstract class AbstractCell {
     static final String INVALID_VALUE = "Invalid value: ";
     static final String INVALID_POSSIBILITY = "Invalid possibility: ";
 
-    abstract Optional<Integer> getValue();
-    abstract Location getLocation();
+    public abstract Optional<Integer> getValue();
+
+    public abstract Location getLocation();
 
     @Value.Default
     public Set<Integer> getPossibilities() {
@@ -27,28 +28,28 @@ abstract class AbstractCell {
         return getDefaultPossibilities(9);
     }
 
+    private static Set<Integer> getDefaultPossibilities(int maxPosibilities) {
+        return IntStream.rangeClosed(1, maxPosibilities)
+                .boxed()
+                .collect(Collectors.toSet());
+    }
+
     @Value.Check
     void validate() {
-        getValue().ifPresent(value -> validateValue(value));
+        getValue().ifPresent(this::validateValue);
         getPossibilities().stream()
                 .forEach(this::validatePossibility);
     }
 
-    void validateValue(int value) {
+    private void validateValue(int value) {
         Validate.isTrue(isValidNumber(value), INVALID_VALUE, value);
     }
 
-    void validatePossibility(int possibility) {
+    private void validatePossibility(int possibility) {
         Validate.isTrue(isValidNumber(possibility), INVALID_POSSIBILITY, possibility);
     }
 
-    boolean isValidNumber(int number) {
+    private boolean isValidNumber(int number) {
         return number > 0 && number <= 9;
-    }
-
-    static Set<Integer> getDefaultPossibilities(int maxPosibilities) {
-        return IntStream.rangeClosed(1, maxPosibilities)
-                .boxed()
-                .collect(Collectors.toSet());
     }
 }

@@ -22,16 +22,8 @@ public class CellTest {
     @Test
     public void emptyCreation() {
         Cell emptyCell = createEmptyCell();
-        Set<Integer> expectedPossibilities = Cell.getDefaultPossibilities(9);
 
         Set<Integer> result = emptyCell.getPossibilities();
-
-        assertThat(result).isEqualTo(expectedPossibilities);
-    }
-
-    @Test
-    public void defaultPossibilities() {
-        Set<Integer> result = Cell.getDefaultPossibilities(9);
 
         assertThat(result).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
     }

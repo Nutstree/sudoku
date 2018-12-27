@@ -10,9 +10,10 @@ abstract class AbstractLocation {
     static final String ILLEGAL_Y = "Illegal Y argument: ";
 
     @Value.Parameter
-    abstract int getX();
+    public abstract int getX();
+
     @Value.Parameter
-    abstract int getY();
+    public abstract int getY();
 
     @Value.Derived
     public int getQuadrant() {
