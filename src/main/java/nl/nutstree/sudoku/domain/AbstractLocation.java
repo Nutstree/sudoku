@@ -6,14 +6,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class AbstractLocation {
 
-    static String ILLEGAL_X = "Illegal X argument: ";
-    static String ILLEGAL_Y = "Illegal Y argument: ";
+    static final String ILLEGAL_X = "Illegal X argument: ";
+    static final String ILLEGAL_Y = "Illegal Y argument: ";
 
     @Value.Parameter
     abstract int getX();
     @Value.Parameter
     abstract int getY();
 
+    @Value.Derived
     public int getQuadrant() {
         return ((getY() / 3) * 3) + (getX() / 3);
     }
