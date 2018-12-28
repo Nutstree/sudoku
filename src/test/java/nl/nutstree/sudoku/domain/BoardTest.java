@@ -98,6 +98,14 @@ class BoardTest {
     }
 
     @Test
+    public void toStringTest() {
+        board = new Board("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+
+        System.out.println(board);
+        assertThat(board.toString()).contains("Board");
+    }
+
+    @Test
     public void setIllegalValues_throwsExeption() {
         assertThatThrownBy(() -> board.setValue(0, Location.of(0, 0)))
                 .isInstanceOf(IllegalArgumentException.class);

@@ -30,8 +30,8 @@ public class Board {
     }
 
     private void fillBoard(String puzzle) {
-        for (int x = 0; x < SIZE; x++) {
-            for (int y = 0; y < SIZE; y++) {
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
                 Location location = Location.of(x, y);
                 int value = getValue(puzzle, x + (y * SIZE));
 
@@ -132,5 +132,26 @@ public class Board {
                 .filter(e -> e.getKey().getY() == y)
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder().append("SudokuBoard: \n");
+
+        int placeOfQuadrantWhiteSpace = (int) Math.sqrt(SIZE);
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
+                if (x != 0 && x % placeOfQuadrantWhiteSpace == 0) {
+                    stringBuilder.append("  ");
+                }
+                if (y != 0 && x == 0 && y % placeOfQuadrantWhiteSpace == 0) {
+                    stringBuilder.append("\n");
+                }
+                stringBuilder.append(getValue(Location.of(x, y)).orElse(0));
+            }
+            stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
     }
 }
