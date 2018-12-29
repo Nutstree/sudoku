@@ -4,7 +4,6 @@ import org.apache.commons.lang3.Validate;
 import org.immutables.value.Value;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -13,15 +12,25 @@ import java.util.stream.IntStream;
 abstract class AbstractCell {
 
     static final String INVALID_VALUE = "Invalid value: ";
-    static final String INVALID_POSSIBILITY = "Invalid possibility: ";
 
-    public abstract Optional<Integer> getValue();
+    /**
+     * helper factory method
+     *
+     * @return Cell without a value
+     */
+    @Value.Auxiliary
+    public static Cell empty() {
+        return new Cell.Builder()
+                .value(0)
+                .build();
+    }
 
-    public abstract Location getLocation();
+    @Value.Parameter
+    abstract int getValue();
 
     @Value.Default
     public Set<Integer> getPossibilities() {
-        if (getValue().isPresent()) {
+        if (getValue() != 0) {
             return Collections.emptySet();
         }
 
@@ -34,22 +43,9 @@ abstract class AbstractCell {
                 .collect(Collectors.toSet());
     }
 
+    //TODO hmm invalid value is determined by board size...
     @Value.Check
     void validate() {
-        getValue().ifPresent(this::validateValue);
-        getPossibilities().stream()
-                .forEach(this::validatePossibility);
-    }
-
-    private void validateValue(int value) {
-        Validate.isTrue(isValidNumber(value), INVALID_VALUE, value);
-    }
-
-    private void validatePossibility(int possibility) {
-        Validate.isTrue(isValidNumber(possibility), INVALID_POSSIBILITY, possibility);
-    }
-
-    private boolean isValidNumber(int number) {
-        return number > 0 && number <= 9;
+        Validate.inclusiveBetween(0, 9, getValue(), INVALID_VALUE, getValue());
     }
 }

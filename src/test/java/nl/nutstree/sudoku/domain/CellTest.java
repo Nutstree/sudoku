@@ -3,7 +3,6 @@ package nl.nutstree.sudoku.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,12 +20,16 @@ public class CellTest {
 
     @Test
     public void emptyCreation() {
-        Cell emptyCell = createEmptyCell();
+        Cell emptyCell = Cell.empty();
 
-        Set<Integer> result = emptyCell.getPossibilities();
-
-        assertThat(result).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        assertCellEmpty(emptyCell);
     }
+
+    private void assertCellEmpty(Cell emptyCell) {
+        assertThat(emptyCell.getValue()).isEqualTo(0);
+        assertThat(emptyCell.getPossibilities()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    }
+
 
     @Test
     public void negativeValue() {
@@ -35,9 +38,10 @@ public class CellTest {
     }
 
     @Test
-    public void zeroValue() {
-        assertThatThrownBy(() -> createCellWithValue(0))
-                .isInstanceOf(IllegalArgumentException.class);
+    public void zeroValue_isEmptyCell() {
+        Cell result = createCellWithValue(0);
+
+        assertCellEmpty(result);
     }
 
     @Test
@@ -56,20 +60,13 @@ public class CellTest {
     private void assertValueCreatesValidCell(int value) {
         Cell result = createCellWithValue(value);
 
-        assertThat(result.getValue()).contains(value);
+        assertThat(result.getValue()).isEqualTo(value);
         assertThat(result.getPossibilities()).isEmpty();
-    }
-
-    private Cell createEmptyCell() {
-        return new Cell.Builder()
-                .location(dummylocation)
-                .build();
     }
 
     private Cell createCellWithValue(int value) {
         return new Cell.Builder()
                 .value(value)
-                .location(dummylocation)
                 .build();
     }
 }
