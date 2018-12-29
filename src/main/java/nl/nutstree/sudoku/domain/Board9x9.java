@@ -56,7 +56,7 @@ public class Board9x9 implements Board {
         return SIZE;
     }
 
-    public int getValue(Location location) {
+    public Optional<Integer> getValue(Location location) {
         validateLocation(location);
         return cellMap.get(location).getValue();
     }
@@ -148,8 +148,8 @@ public class Board9x9 implements Board {
     }
 
     void validateLocation(Location location) {
-        Validate.inclusiveBetween(0, getSize() - 1, location.getRow(), ILLEGAL_LOCATION_ROW + location.getRow());
-        Validate.inclusiveBetween(0, getSize() - 1, location.getColumn(), ILLEGAL_LOCATION_COLUMN + location.getColumn());
+        Validate.inclusiveBetween(0, getSize() - 1L, location.getRow(), ILLEGAL_LOCATION_ROW + location.getRow());
+        Validate.inclusiveBetween(0, getSize() - 1L, location.getColumn(), ILLEGAL_LOCATION_COLUMN + location.getColumn());
     }
 
     @Override
@@ -165,7 +165,9 @@ public class Board9x9 implements Board {
                 if (y != 0 && x == 0 && y % quadrantSize == 0) {
                     stringBuilder.append("\n");
                 }
-                stringBuilder.append(getValue(Location.of(x, y)));
+                Optional<Integer> value = getValue(Location.of(x, y));
+                String stringValue = value.isPresent() ? "[" + value.get() + "]" : "[ ]";
+                stringBuilder.append(stringValue);
             }
             stringBuilder.append("\n");
         }

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.immutables.value.Value;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,25 +13,13 @@ import java.util.stream.IntStream;
 abstract class AbstractCell {
 
     static final String INVALID_VALUE = "Invalid value: ";
+    static final String INVALID_POSSIBILITY = "Invalid possibility: ";
 
-    /**
-     * helper factory method
-     *
-     * @return Cell without a value
-     */
-    @Value.Auxiliary
-    public static Cell empty() {
-        return new Cell.Builder()
-                .value(0)
-                .build();
-    }
-
-    @Value.Parameter
-    abstract int getValue();
+    public abstract Optional<Integer> getValue();
 
     @Value.Default
     public Set<Integer> getPossibilities() {
-        if (getValue() != 0) {
+        if (getValue().isPresent()) {
             return Collections.emptySet();
         }
 
@@ -43,9 +32,45 @@ abstract class AbstractCell {
                 .collect(Collectors.toSet());
     }
 
-    //TODO hmm invalid value is determined by board size...
+    /**
+     * helper factory method
+     *
+     * @return Cell without a value
+     */
+    @Value.Auxiliary
+    public static Cell empty() {
+        return new Cell.Builder()
+                .build();
+    }
+
+    /**
+     * helper factory method
+     *
+     * @return Cell without a value
+     */
+    @Value.Auxiliary
+    public static Cell of(int value) {
+        return new Cell.Builder()
+                .value(value)
+                .build();
+    }
+
     @Value.Check
     void validate() {
-        Validate.inclusiveBetween(0, 9, getValue(), INVALID_VALUE, getValue());
+        getValue().ifPresent(this::validateValue);
+        getPossibilities().stream()
+                .forEach(this::validatePossibility);
+    }
+
+    private void validateValue(int value) {
+        Validate.isTrue(isValidNumber(value), INVALID_VALUE, value);
+    }
+
+    private void validatePossibility(int possibility) {
+        Validate.isTrue(isValidNumber(possibility), INVALID_POSSIBILITY, possibility);
+    }
+
+    private boolean isValidNumber(int number) {
+        return number > 0 && number <= 9;
     }
 }

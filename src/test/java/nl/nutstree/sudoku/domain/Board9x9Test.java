@@ -35,7 +35,7 @@ class Board9x9Test {
     }
 
     private void assertThatLocationIsUntouched(Location location) {
-        assertThat(board.getValue(location)).isEqualTo(0);
+        assertThat(board.getValue(location)).isEmpty();
         assertThat(board.getPossibilities(location)).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
     }
 
@@ -44,46 +44,46 @@ class Board9x9Test {
         board = new Board9x9("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // 010020300
-        assertThat(board.getValue(Location.of(1, 0))).isEqualTo(1);
-        assertThat(board.getValue(Location.of(4, 0))).isEqualTo(2);
-        assertThat(board.getValue(Location.of(6, 0))).isEqualTo(3);
-        assertThat(board.getValue(Location.of(0, 0))).isEqualTo(0);
+        assertThat(board.getValue(Location.of(1, 0))).contains(1);
+        assertThat(board.getValue(Location.of(4, 0))).contains(2);
+        assertThat(board.getValue(Location.of(6, 0))).contains(3);
+        assertThat(board.getValue(Location.of(0, 0))).isEmpty();
 
         // 004005060
-        assertThat(board.getValue(Location.of(2, 1))).isEqualTo(4);
-        assertThat(board.getValue(Location.of(5, 1))).isEqualTo(5);
-        assertThat(board.getValue(Location.of(7, 1))).isEqualTo(6);
+        assertThat(board.getValue(Location.of(2, 1))).contains(4);
+        assertThat(board.getValue(Location.of(5, 1))).contains(5);
+        assertThat(board.getValue(Location.of(7, 1))).contains(6);
 
         // 070000008
-        assertThat(board.getValue(Location.of(1, 2))).isEqualTo(7);
-        assertThat(board.getValue(Location.of(8, 2))).isEqualTo(8);
+        assertThat(board.getValue(Location.of(1, 2))).contains(7);
+        assertThat(board.getValue(Location.of(8, 2))).contains(8);
 
         // 006900070
-        assertThat(board.getValue(Location.of(2, 3))).isEqualTo(6);
-        assertThat(board.getValue(Location.of(3, 3))).isEqualTo(9);
-        assertThat(board.getValue(Location.of(7, 3))).isEqualTo(7);
+        assertThat(board.getValue(Location.of(2, 3))).contains(6);
+        assertThat(board.getValue(Location.of(3, 3))).contains(9);
+        assertThat(board.getValue(Location.of(7, 3))).contains(7);
 
         // 000100002
-        assertThat(board.getValue(Location.of(3, 4))).isEqualTo(1);
-        assertThat(board.getValue(Location.of(8, 4))).isEqualTo(2);
+        assertThat(board.getValue(Location.of(3, 4))).contains(1);
+        assertThat(board.getValue(Location.of(8, 4))).contains(2);
 
         // 030048000
-        assertThat(board.getValue(Location.of(1, 5))).isEqualTo(3);
-        assertThat(board.getValue(Location.of(4, 5))).isEqualTo(4);
-        assertThat(board.getValue(Location.of(5, 5))).isEqualTo(8);
+        assertThat(board.getValue(Location.of(1, 5))).contains(3);
+        assertThat(board.getValue(Location.of(4, 5))).contains(4);
+        assertThat(board.getValue(Location.of(5, 5))).contains(8);
 
         // 500006040
-        assertThat(board.getValue(Location.of(0, 6))).isEqualTo(5);
-        assertThat(board.getValue(Location.of(5, 6))).isEqualTo(6);
-        assertThat(board.getValue(Location.of(7, 6))).isEqualTo(4);
+        assertThat(board.getValue(Location.of(0, 6))).contains(5);
+        assertThat(board.getValue(Location.of(5, 6))).contains(6);
+        assertThat(board.getValue(Location.of(7, 6))).contains(4);
 
         // 000800106
-        assertThat(board.getValue(Location.of(3, 7))).isEqualTo(8);
-        assertThat(board.getValue(Location.of(6, 7))).isEqualTo(1);
-        assertThat(board.getValue(Location.of(8, 7))).isEqualTo(6);
+        assertThat(board.getValue(Location.of(3, 7))).contains(8);
+        assertThat(board.getValue(Location.of(6, 7))).contains(1);
+        assertThat(board.getValue(Location.of(8, 7))).contains(6);
 
         // 008000000
-        assertThat(board.getValue(Location.of(2, 8))).isEqualTo(8);
+        assertThat(board.getValue(Location.of(2, 8))).contains(8);
     }
 
     @Test
@@ -91,15 +91,15 @@ class Board9x9Test {
         board = new Board9x9("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // random pick to check if fields are left empty
-        assertThat(board.getValue(Location.of(0, 0))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(6, 1))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(3, 2))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(8, 3))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(2, 4))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(7, 5))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(1, 6))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(4, 7))).isEqualTo(0);
-        assertThat(board.getValue(Location.of(5, 8))).isEqualTo(0);
+        assertThat(board.getValue(Location.of(0, 0))).isEmpty();
+        assertThat(board.getValue(Location.of(6, 1))).isEmpty();
+        assertThat(board.getValue(Location.of(3, 2))).isEmpty();
+        assertThat(board.getValue(Location.of(8, 3))).isEmpty();
+        assertThat(board.getValue(Location.of(2, 4))).isEmpty();
+        assertThat(board.getValue(Location.of(7, 5))).isEmpty();
+        assertThat(board.getValue(Location.of(1, 6))).isEmpty();
+        assertThat(board.getValue(Location.of(4, 7))).isEmpty();
+        assertThat(board.getValue(Location.of(5, 8))).isEmpty();
     }
 
     @Test
@@ -132,7 +132,7 @@ class Board9x9Test {
         Location location = Location.of(6, 6);
         board.setValue(value, location);
 
-        assertThat(board.getValue(location)).isEqualTo(value);
+        assertThat(board.getValue(location)).contains(value);
         assertThat(board.getPossibilities(location)).isEmpty();
     }
 

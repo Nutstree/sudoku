@@ -1,6 +1,5 @@
 package nl.nutstree.sudoku.domain;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
@@ -11,62 +10,45 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class CellTest {
 
-    private Location dummylocation;
-
-    @BeforeEach
-    public void setUp() {
-        dummylocation = dummylocation.of(1, 1);
-    }
-
     @Test
-    public void emptyCreation() {
+    public void emptyConstructorMethod() {
         Cell emptyCell = Cell.empty();
 
         assertCellEmpty(emptyCell);
     }
 
     private void assertCellEmpty(Cell emptyCell) {
-        assertThat(emptyCell.getValue()).isEqualTo(0);
+        assertThat(emptyCell.getValue()).isEmpty();
         assertThat(emptyCell.getPossibilities()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9);
     }
 
-
     @Test
     public void negativeValue() {
-        assertThatThrownBy(() -> createCellWithValue(-1))
+        assertThatThrownBy(() -> Cell.of(-1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void zeroValue_isEmptyCell() {
-        Cell result = createCellWithValue(0);
-
-        assertCellEmpty(result);
+    public void zeroValue() {
+        assertThatThrownBy(() -> Cell.of(0))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void tooBigValue() {
-        assertThatThrownBy(() -> createCellWithValue(10))
+        assertThatThrownBy(() -> Cell.of(10))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void validValues() {
         IntStream.rangeClosed(1, 9)
-                .forEach(this::assertValueCreatesValidCell);
+                .forEach(i -> assertThatCellContainsValue(Cell.of(i), i));
 
     }
 
-    private void assertValueCreatesValidCell(int value) {
-        Cell result = createCellWithValue(value);
-
-        assertThat(result.getValue()).isEqualTo(value);
-        assertThat(result.getPossibilities()).isEmpty();
-    }
-
-    private Cell createCellWithValue(int value) {
-        return new Cell.Builder()
-                .value(value)
-                .build();
+    private void assertThatCellContainsValue(Cell cell, int value) {
+        assertThat(cell.getValue()).contains(value);
+        assertThat(cell.getPossibilities()).isEmpty();
     }
 }
