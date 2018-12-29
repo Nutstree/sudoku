@@ -9,10 +9,14 @@ import java.util.stream.IntStream;
 public class Board9x9 implements Board {
     private final Map<Location, Cell> cellMap;
     private static final int SIZE = 9;
+    //    private static final Set<Integer> VALID_VALUES = Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    private static final Set<Integer> VALID_VALUES = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+
     static final String BOARD_NAME = "Sudoku Board 9x9";
     static final String ILLEGAL_VALUE = "Illegal value: ";
     static final String ILLEGAL_LOCATION_ROW = "Illegal row for location: ";
     static final String ILLEGAL_LOCATION_COLUMN = "Illegal column for location: ";
+
 
     public Board9x9() {
         cellMap = new LinkedHashMap<>();
@@ -39,17 +43,30 @@ public class Board9x9 implements Board {
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 Location location = Location.of(x, y);
-                int value = getValue(puzzle, x + (y * SIZE));
+                int value = getValueFromPuzzleString(puzzle, x + (y * SIZE));
 
-                Cell cell = value == 0 ? Cell.empty() : Cell.of(value);
+                Cell cell = value == 0 ? createEmptyCell() : createCell(value);
 
                 cellMap.put(location, cell);
             }
         }
     }
 
-    private int getValue(String puzzle, int stringPosition) {
+    private int getValueFromPuzzleString(String puzzle, int stringPosition) {
         return Integer.valueOf(puzzle.substring(stringPosition, stringPosition + 1));
+    }
+
+    private Cell createEmptyCell() {
+        return new Cell.Builder()
+                .addAllValidValues(VALID_VALUES)
+                .build();
+    }
+
+    private Cell createCell(int value) {
+        return new Cell.Builder()
+                .addAllValidValues(VALID_VALUES)
+                .value(value)
+                .build();
     }
 
     public int getSize() {
@@ -67,10 +84,8 @@ public class Board9x9 implements Board {
     }
 
     public void setValue(int value, Location location) {
-        validateValue(value);
         validateLocation(location);
-        Cell oldCell = cellMap.get(location);
-        Cell newCell = oldCell.withValue(value).withPossibilities();
+        Cell newCell = createCell(value);
 
         cellMap.put(location, newCell);
         Collection<Location> relatedLocations = getRelatedLocations(location);
@@ -141,10 +156,6 @@ public class Board9x9 implements Board {
 
     private static int getQuadrantSize() {
         return (int) Math.sqrt(SIZE);
-    }
-
-    void validateValue(int value) {
-        Validate.inclusiveBetween(1, getSize(), value, ILLEGAL_VALUE + value);
     }
 
     void validateLocation(Location location) {

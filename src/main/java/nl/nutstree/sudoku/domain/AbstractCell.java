@@ -6,14 +6,16 @@ import org.immutables.value.Value;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Value.Immutable
 abstract class AbstractCell {
 
-    static final String INVALID_VALUE = "Invalid value: ";
-    static final String INVALID_POSSIBILITY = "Invalid possibility: ";
+    static final String INVALID_VALUE = "Invalid value: %s";
+    static final String INVALID_POSSIBILITY = "Invalid possibility: %s";
+    static final String INVALID_STATE_BOTH_FILLED = "Value and possibilities can't co-exist within Cell: %s";
+    static final String INVALID_STATE_BOTH_EMPTY = "Value and possibilities can't both be empty: %s";
+
+    public abstract Set<Integer> getValidValues();
 
     public abstract Optional<Integer> getValue();
 
@@ -23,54 +25,26 @@ abstract class AbstractCell {
             return Collections.emptySet();
         }
 
-        return getDefaultPossibilities(9);
-    }
-
-    private static Set<Integer> getDefaultPossibilities(int maxPosibilities) {
-        return IntStream.rangeClosed(1, maxPosibilities)
-                .boxed()
-                .collect(Collectors.toSet());
-    }
-
-    /**
-     * helper factory method
-     *
-     * @return Cell without a value
-     */
-    @Value.Auxiliary
-    public static Cell empty() {
-        return new Cell.Builder()
-                .build();
-    }
-
-    /**
-     * helper factory method
-     *
-     * @return Cell without a value
-     */
-    @Value.Auxiliary
-    public static Cell of(int value) {
-        return new Cell.Builder()
-                .value(value)
-                .build();
+        return getValidValues();
     }
 
     @Value.Check
     void validate() {
-        getValue().ifPresent(this::validateValue);
-        getPossibilities().stream()
-                .forEach(this::validatePossibility);
+        //getValue().ifPresentOrElse(this::validateValue, this::validatePossibilities);
+        if (getValue().isPresent()) {
+            validateValue(getValue().get());
+        } else {
+            validatePossibilities();
+        }
     }
 
     private void validateValue(int value) {
-        Validate.isTrue(isValidNumber(value), INVALID_VALUE, value);
+        Validate.isTrue(getValidValues().contains(value), INVALID_VALUE, value);
+        Validate.validState(getPossibilities().isEmpty(), INVALID_STATE_BOTH_FILLED, this);
     }
 
-    private void validatePossibility(int possibility) {
-        Validate.isTrue(isValidNumber(possibility), INVALID_POSSIBILITY, possibility);
-    }
-
-    private boolean isValidNumber(int number) {
-        return number > 0 && number <= 9;
+    private void validatePossibilities() {
+        Validate.isTrue(getValidValues().containsAll(getPossibilities()), INVALID_POSSIBILITY, getPossibilities());
+        Validate.validState(!getPossibilities().isEmpty(), INVALID_STATE_BOTH_EMPTY, this);
     }
 }

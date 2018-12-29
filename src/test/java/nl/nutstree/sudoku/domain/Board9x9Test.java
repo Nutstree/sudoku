@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -122,10 +121,15 @@ class Board9x9Test {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    //TODO: add test for overwriting a value which is already set
+    // take care of the old value and related cell possibilities, put them back
+
     @Test
     public void setLegalValues_containsValueAfterSetting() {
-        IntStream.rangeClosed(1, 9)
-        .forEach(this::assertSetValueCorrect);
+        assertSetValueCorrect(2);
+        assertSetValueCorrect(5);
+        assertSetValueCorrect(8);
+        assertSetValueCorrect(3);
     }
 
     private void assertSetValueCorrect(int value) {
