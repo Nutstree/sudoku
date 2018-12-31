@@ -37,17 +37,6 @@ public class CellTest {
     }
 
     @Test
-    public void valueAndPossibilitiesSet_throwsException() {
-        ImmutableCell.Builder cellBuilder = new ImmutableCell.Builder()
-                .boardType(Type.SQUARE_9X9)
-                .addPossibilities(1, 2, 4, 5, 6)
-                .value(2);
-
-        assertThatThrownBy(() -> cellBuilder.build())
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
     public void validValue() {
         Type type = Type.SQUARE_9X9;
         Cell cell = new ImmutableCell.Builder()

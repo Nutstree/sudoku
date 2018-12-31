@@ -15,7 +15,7 @@ class SquareBoardTest {
 
     @BeforeEach
     public void setUp() {
-        board = new SquareBoard(Type.SQUARE_9X9);
+        board = SquareBoard.Factory.empty(Type.SQUARE_9X9);
     }
 
     @Test
@@ -40,7 +40,7 @@ class SquareBoardTest {
 
     @Test
     public void constructBoardWithSudokuPuzzle_nonZeroFieldsCorrectlyFilled() {
-        board = new SquareBoard("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // 010020300
         assertThat(board.getValue(ImmutableLocation.of(1, 0))).contains(1);
@@ -86,7 +86,7 @@ class SquareBoardTest {
 
     @Test
     public void constructBoardWithSudokuPuzzle_zeroFieldsStillEmpty() {
-        board = new SquareBoard("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // random pick to check if fields are left empty
         assertThat(board.getValue(ImmutableLocation.of(0, 0))).isEmpty();
@@ -102,7 +102,7 @@ class SquareBoardTest {
 
     @Test
     public void toStringTest() {
-        board = new SquareBoard("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         System.out.println(board);
         assertThat(board.toString()).contains(SquareBoard.BOARD_NAME);
@@ -121,7 +121,7 @@ class SquareBoardTest {
     }
 
     @Test
-    public void getValueWithInvalidLocation_throwsException() {
+    public void setValueWithInvalidLocation_throwsException() {
         Location invalidLocation = ImmutableLocation.of(Type.SQUARE_4X4, 0, 0);
 
         assertThatThrownBy(() -> board.setValue(0, invalidLocation))
@@ -141,13 +141,12 @@ class SquareBoardTest {
         board.setValue(value, location);
 
         assertThat(board.getValue(location)).contains(value);
-        assertThat(board.getPossibilities(location)).isEmpty();
     }
 
     @Test
     public void afterSettingValueOnlocation_relatedCellsPossibilityAdjusted() {
         Location location = ImmutableLocation.of(7, 7);
-        Collection<Location> relatedLocations = board.getRelatedLocations(location);
+        Collection<Location> relatedLocations = board.getLocations().getRelatedLocations(location);
         Collection<Location> unrelatedLocations = getUnrelatedLocations(relatedLocations);
 
         board.setValue(5, location);
@@ -173,44 +172,9 @@ class SquareBoardTest {
     }
 
     private Collection<Location> getUnrelatedLocations(Collection<Location> relatedLocations) {
-        Collection<Location> locations = new HashSet<Location>(board.getAllLocations());
+        Collection<Location> locations = new HashSet<Location>(board.getLocations().getAllLocations());
         locations.removeAll(relatedLocations);
 
         return locations;
-    }
-
-    @Test
-    public void getLocationsInRow() {
-        board.getLocationsInSameRow(ImmutableLocation.of(0, 0)).stream()
-                .forEach(location -> assertThat(location.getRow()).isEqualTo(0));
-        board.getLocationsInSameRow(ImmutableLocation.of(5, 0)).stream()
-                .forEach(location -> assertThat(location.getRow()).isEqualTo(5));
-        board.getLocationsInSameRow(ImmutableLocation.of(8, 0)).stream()
-                .forEach(location -> assertThat(location.getRow()).isEqualTo(8));
-    }
-
-    @Test
-    public void getLocationsInColumn() {
-        board.getLocationsInSameColumn(ImmutableLocation.of(0, 1)).stream()
-                .forEach(location -> assertThat(location.getColumn()).isEqualTo(1));
-        board.getLocationsInSameColumn(ImmutableLocation.of(0, 4)).stream()
-                .forEach(location -> assertThat(location.getColumn()).isEqualTo(4));
-        board.getLocationsInSameColumn(ImmutableLocation.of(0, 7)).stream()
-                .forEach(location -> assertThat(location.getColumn()).isEqualTo(7));
-    }
-
-    @Test
-    public void getLocationsInQuadrant() {
-        assertgetCellsInQuadrant(ImmutableLocation.of(4, 5));
-        assertgetCellsInQuadrant(ImmutableLocation.of(6, 1));
-        assertgetCellsInQuadrant(ImmutableLocation.of(0, 2));
-    }
-
-    private void assertgetCellsInQuadrant(Location location) {
-        int expectedQuadrant = location.getQuadrant();
-
-        board.getLocationsInSameQuadrant(location).stream()
-                .map(Location::getQuadrant)
-                .forEach(result -> assertThat(result).isEqualTo(expectedQuadrant));
     }
 }

@@ -12,61 +12,9 @@ public class SquareBoard implements Board {
     private final Type type;
     static final String BOARD_NAME = "Sudoku Board";
 
-    public SquareBoard(Type type) {
+    private SquareBoard(Type type, Map<Location, Cell> cellMap) {
         this.type = type;
-        cellMap = new LinkedHashMap<>();
-        fillBoardWithEmptyCells();
-    }
-
-    public SquareBoard(String puzzle) {
-        type = determineType(puzzle);
-        cellMap = new LinkedHashMap<>();
-        fillBoard(puzzle);
-    }
-
-    private static Type determineType(String puzzle) {
-        return Type.valueOf((int) Math.sqrt(puzzle.length()));
-    }
-
-    private void fillBoardWithEmptyCells() {
-        String emptyPuzzle = createEmptyPuzzleString();
-        fillBoard(emptyPuzzle);
-    }
-
-    private String createEmptyPuzzleString() {
-        return IntStream.range(0, getSize() * getSize())
-                .mapToObj(i -> "0")
-                .collect(Collectors.joining());
-    }
-
-    private void fillBoard(String puzzle) {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                Location location = ImmutableLocation.of(x, y);
-                int value = getValueFromPuzzleString(puzzle, x + (y * getSize()));
-
-                Cell cell = value == 0 ? createEmptyCell() : createCell(value);
-
-                cellMap.put(location, cell);
-            }
-        }
-    }
-
-    private int getValueFromPuzzleString(String puzzle, int stringPosition) {
-        return Integer.valueOf(puzzle.substring(stringPosition, stringPosition + 1));
-    }
-
-    private Cell createEmptyCell() {
-        return new ImmutableCell.Builder()
-                .boardType(type)
-                .build();
-    }
-
-    private Cell createCell(int value) {
-        return new ImmutableCell.Builder()
-                .boardType(type)
-                .value(value)
-                .build();
+        this.cellMap = cellMap;
     }
 
     public int getSize() {
@@ -85,7 +33,8 @@ public class SquareBoard implements Board {
 
     public void setValue(int value, Location location) {
         validateLocation(location);
-        Cell newCell = createCell(value);
+        ImmutableCell oldCell = (ImmutableCell) cellMap.get(location);
+        Cell newCell = oldCell.withValue(value);
 
         cellMap.put(location, newCell);
         Collection<Location> relatedLocations = getRelatedLocations(location);
@@ -105,6 +54,13 @@ public class SquareBoard implements Board {
         Cell newCell = cell.withPossibilities(possibilities);
 
         cellMap.put(location, newCell);
+    }
+
+    public Locations getLocations() {
+        return new ImmutableLocations.Builder()
+                .boardType(type)
+                .allLocations(cellMap.keySet())
+                .build();
     }
 
     public Collection<Location> getAllLocations() {
@@ -175,5 +131,71 @@ public class SquareBoard implements Board {
         }
 
         return stringBuilder.toString();
+    }
+
+    public static class Factory {
+        static Map<Location, Cell> cellMap;
+        static Type type;
+
+        public static SquareBoard empty(Type boardType) {
+            type = boardType;
+            cellMap = new LinkedHashMap<>();
+            fillBoardWithEmptyCells();
+
+            return new SquareBoard(type, cellMap);
+        }
+
+        public static SquareBoard of(String puzzle) {
+            type = determineType(puzzle);
+            cellMap = new LinkedHashMap<>();
+            fillBoard(puzzle);
+
+            return new SquareBoard(type, cellMap);
+        }
+
+        private static Type determineType(String puzzle) {
+            return Type.valueOf((int) Math.sqrt(puzzle.length()));
+        }
+
+        private static void fillBoardWithEmptyCells() {
+            String emptyPuzzle = createEmptyPuzzleString();
+            fillBoard(emptyPuzzle);
+        }
+
+        private static String createEmptyPuzzleString() {
+            return IntStream.range(0, type.getSize() * type.getSize())
+                    .mapToObj(i -> "0")
+                    .collect(Collectors.joining());
+        }
+
+        private static void fillBoard(String puzzle) {
+            for (int y = 0; y < type.getSize(); y++) {
+                for (int x = 0; x < type.getSize(); x++) {
+                    Location location = ImmutableLocation.of(x, y);
+                    int value = getValueFromPuzzleString(puzzle, x + (y * type.getSize()));
+
+                    Cell cell = value == 0 ? createEmptyCell() : createCell(value);
+
+                    cellMap.put(location, cell);
+                }
+            }
+        }
+
+        private static int getValueFromPuzzleString(String puzzle, int stringPosition) {
+            return Integer.valueOf(puzzle.substring(stringPosition, stringPosition + 1));
+        }
+
+        private static Cell createEmptyCell() {
+            return new ImmutableCell.Builder()
+                    .boardType(type)
+                    .build();
+        }
+
+        private static Cell createCell(int value) {
+            return new ImmutableCell.Builder()
+                    .boardType(type)
+                    .value(value)
+                    .build();
+        }
     }
 }

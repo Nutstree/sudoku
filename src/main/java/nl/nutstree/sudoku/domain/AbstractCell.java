@@ -12,7 +12,6 @@ abstract class AbstractCell implements Cell {
 
     static final String INVALID_VALUE = "Invalid value: %s";
     static final String INVALID_POSSIBILITY = "Invalid possibility: %s";
-    static final String INVALID_STATE_BOTH_FILLED = "Value and possibilities can't co-exist within Cell: %s";
 
     @Value.Default
     public Type getBoardType() {
@@ -39,7 +38,6 @@ abstract class AbstractCell implements Cell {
 
     private void validateValue(int value) {
         Validate.isTrue(getBoardType().getValidValues().contains(value), INVALID_VALUE, value);
-        Validate.validState(getPossibilities().isEmpty(), INVALID_STATE_BOTH_FILLED, this);
     }
 
     private void validatePossibilities() {

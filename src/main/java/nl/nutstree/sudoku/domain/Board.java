@@ -12,13 +12,6 @@ public interface Board {
 
     void setValue(int value, Location location);
 
-    Collection<Location> getAllLocations();
+    Locations getLocations();
 
-    Collection<Location> getLocationsInSameRow(Location referenceLocation);
-
-    Collection<Location> getLocationsInSameColumn(Location referenceLocation);
-
-    Collection<Location> getLocationsInSameQuadrant(Location referenceLocation);
-
-    Collection<Location> getRelatedLocations(Location referenceLocation);
 }
