@@ -14,11 +14,11 @@ public interface Board {
 
     Collection<Location> getAllLocations();
 
-    Collection<Location> getLocationsInRow(Location referenceLocation);
+    Collection<Location> getLocationsInSameRow(Location referenceLocation);
 
-    Collection<Location> getLocationsInColumn(Location referenceLocation);
+    Collection<Location> getLocationsInSameColumn(Location referenceLocation);
 
-    Collection<Location> getLocationsInQuadrant(Location referenceLocation);
+    Collection<Location> getLocationsInSameQuadrant(Location referenceLocation);
 
     Collection<Location> getRelatedLocations(Location referenceLocation);
 }

@@ -6,26 +6,26 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Board9x9 implements Board {
+public class SquareBoard implements Board {
+    public static final String INVALID_LOCATION = "Location is made for a different board: %s, location: %s";
     private final Map<Location, Cell> cellMap;
-    private static final int SIZE = 9;
-    //    private static final Set<Integer> VALID_VALUES = Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
-    private static final Set<Integer> VALID_VALUES = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+    private final Type type;
+    static final String BOARD_NAME = "Sudoku Board";
 
-    static final String BOARD_NAME = "Sudoku Board 9x9";
-    static final String ILLEGAL_VALUE = "Illegal value: ";
-    static final String ILLEGAL_LOCATION_ROW = "Illegal row for location: ";
-    static final String ILLEGAL_LOCATION_COLUMN = "Illegal column for location: ";
-
-
-    public Board9x9() {
+    public SquareBoard(Type type) {
+        this.type = type;
         cellMap = new LinkedHashMap<>();
         fillBoardWithEmptyCells();
     }
 
-    public Board9x9(String board) {
+    public SquareBoard(String puzzle) {
+        type = determineType(puzzle);
         cellMap = new LinkedHashMap<>();
-        fillBoard(board);
+        fillBoard(puzzle);
+    }
+
+    private static Type determineType(String puzzle) {
+        return Type.valueOf((int) Math.sqrt(puzzle.length()));
     }
 
     private void fillBoardWithEmptyCells() {
@@ -34,16 +34,16 @@ public class Board9x9 implements Board {
     }
 
     private String createEmptyPuzzleString() {
-        return IntStream.range(0, SIZE * SIZE)
+        return IntStream.range(0, getSize() * getSize())
                 .mapToObj(i -> "0")
                 .collect(Collectors.joining());
     }
 
     private void fillBoard(String puzzle) {
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
-                Location location = Location.of(x, y);
-                int value = getValueFromPuzzleString(puzzle, x + (y * SIZE));
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                Location location = ImmutableLocation.of(x, y);
+                int value = getValueFromPuzzleString(puzzle, x + (y * getSize()));
 
                 Cell cell = value == 0 ? createEmptyCell() : createCell(value);
 
@@ -57,20 +57,20 @@ public class Board9x9 implements Board {
     }
 
     private Cell createEmptyCell() {
-        return new Cell.Builder()
-                .addAllValidValues(VALID_VALUES)
+        return new ImmutableCell.Builder()
+                .boardType(type)
                 .build();
     }
 
     private Cell createCell(int value) {
-        return new Cell.Builder()
-                .addAllValidValues(VALID_VALUES)
+        return new ImmutableCell.Builder()
+                .boardType(type)
                 .value(value)
                 .build();
     }
 
     public int getSize() {
-        return SIZE;
+        return type.getSize();
     }
 
     public Optional<Integer> getValue(Location location) {
@@ -98,7 +98,7 @@ public class Board9x9 implements Board {
     }
 
     private void removePossibility(int possibility, Location location) {
-        Cell cell = cellMap.get(location);
+        ImmutableCell cell = (ImmutableCell) cellMap.get(location);
         Set<Integer> possibilities = new HashSet<>(cell.getPossibilities());
 
         possibilities.remove(possibility);
@@ -111,7 +111,7 @@ public class Board9x9 implements Board {
         return Collections.unmodifiableSet(cellMap.keySet());
     }
 
-    public Collection<Location> getLocationsInRow(Location referenceLocation) {
+    public Collection<Location> getLocationsInSameRow(Location referenceLocation) {
         validateLocation(referenceLocation);
 
         int row = referenceLocation.getRow();
@@ -120,7 +120,7 @@ public class Board9x9 implements Board {
                 .collect(Collectors.toSet());
     }
 
-    public Collection<Location> getLocationsInColumn(Location referenceLocation) {
+    public Collection<Location> getLocationsInSameColumn(Location referenceLocation) {
         validateLocation(referenceLocation);
 
         int column = referenceLocation.getColumn();
@@ -129,12 +129,12 @@ public class Board9x9 implements Board {
                 .collect(Collectors.toSet());
     }
 
-    public Collection<Location> getLocationsInQuadrant(Location referenceLocation) {
+    public Collection<Location> getLocationsInSameQuadrant(Location referenceLocation) {
         validateLocation(referenceLocation);
 
-        int quadrant = getQuadrantOf(referenceLocation);
+        int quadrant = referenceLocation.getQuadrant();
         return cellMap.keySet().stream()
-                .filter(location -> getQuadrantOf(location) == quadrant)
+                .filter(location -> location.getQuadrant() == quadrant)
                 .collect(Collectors.toSet());
     }
 
@@ -142,41 +142,32 @@ public class Board9x9 implements Board {
         validateLocation(referenceLocation);
 
         Collection<Location> relatedLocations = new HashSet<>();
-        relatedLocations.addAll(getLocationsInRow(referenceLocation));
-        relatedLocations.addAll(getLocationsInColumn(referenceLocation));
-        relatedLocations.addAll(getLocationsInQuadrant(referenceLocation));
+        relatedLocations.addAll(getLocationsInSameRow(referenceLocation));
+        relatedLocations.addAll(getLocationsInSameColumn(referenceLocation));
+        relatedLocations.addAll(getLocationsInSameQuadrant(referenceLocation));
 
         return relatedLocations;
     }
 
-    static int getQuadrantOf(Location referenceLocation) {
-        final int quadrantSize = getQuadrantSize();
-        return ((referenceLocation.getColumn() / quadrantSize) * quadrantSize) + (referenceLocation.getRow() / quadrantSize);
-    }
-
-    private static int getQuadrantSize() {
-        return (int) Math.sqrt(SIZE);
-    }
-
     void validateLocation(Location location) {
-        Validate.inclusiveBetween(0, getSize() - 1L, location.getRow(), ILLEGAL_LOCATION_ROW + location.getRow());
-        Validate.inclusiveBetween(0, getSize() - 1L, location.getColumn(), ILLEGAL_LOCATION_COLUMN + location.getColumn());
+        Type typeOfLocation = ((ImmutableLocation) location).getBoardType();
+        Validate.isTrue(typeOfLocation == type, INVALID_LOCATION, type, location);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder().append(BOARD_NAME + ": \n");
 
-        int quadrantSize = getQuadrantSize();
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
+        int quadrantSize = (int) Math.sqrt(getSize());
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
                 if (x != 0 && x % quadrantSize == 0) {
                     stringBuilder.append("  ");
                 }
                 if (y != 0 && x == 0 && y % quadrantSize == 0) {
                     stringBuilder.append("\n");
                 }
-                Optional<Integer> value = getValue(Location.of(x, y));
+                Optional<Integer> value = getValue(ImmutableLocation.of(x, y));
                 String stringValue = value.isPresent() ? "[" + value.get() + "]" : "[ ]";
                 stringBuilder.append(stringValue);
             }

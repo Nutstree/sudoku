@@ -1,11 +1,6 @@
 package nl.nutstree.sudoku.domain;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -13,39 +8,38 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class CellTest {
 
-    private Set<Integer> validValues;
+    @Test
+    public void defaultSudokuType_SQUARE9x9() {
+        Cell cell = new ImmutableCell.Builder()
+                .build();
 
-    @BeforeEach
-    public void setUp() {
-        //validValues = Set.of(6);
-        validValues = new HashSet<>(Arrays.asList(6));
+        assertThat(((ImmutableCell) cell).getBoardType()).isEqualByComparingTo(Type.SQUARE_9X9);
     }
 
     @Test
     public void emptyConstructorMethod() {
-        Cell emptyCell = createEmptyCell();
+        Type type = Type.SQUARE_9X9;
+        Cell emptyCell = new ImmutableCell.Builder()
+                .boardType(type)
+                .build();
 
-        assertCellEmpty(emptyCell);
-    }
-
-    private void assertCellEmpty(Cell emptyCell) {
         assertThat(emptyCell.getValue()).isEmpty();
-        assertThat(emptyCell.getPossibilities()).hasSameElementsAs(validValues);
+        assertThat(emptyCell.getPossibilities()).hasSameElementsAs(type.getValidValues());
     }
 
     @Test
     public void valueNotValid_throwsException() {
-        assertThatThrownBy(() -> createCell(5))
+        assertThatThrownBy(() -> createCell4x4(5))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        assertThatThrownBy(() -> createCell(7))
+        assertThatThrownBy(() -> createCell9x9(12))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void valueAndPossibilitiesSet_throwsException() {
-        Cell.Builder cellBuilder = new Cell.Builder()
-                .addValidValues(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        ImmutableCell.Builder cellBuilder = new ImmutableCell.Builder()
+                .boardType(Type.SQUARE_9X9)
                 .addPossibilities(1, 2, 4, 5, 6)
                 .value(2);
 
@@ -54,18 +48,14 @@ public class CellTest {
     }
 
     @Test
-    public void valueAndPossibilitiesBothEmpty_throwsException() {
-        Cell.Builder cellBuilder = new Cell.Builder()
-                .addValidValues(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                .addPossibilities();
-
-        assertThatThrownBy(() -> cellBuilder.build())
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
     public void validValue() {
-        assertThatCellContainsValue(createCell(6), 6);
+        Type type = Type.SQUARE_9X9;
+        Cell cell = new ImmutableCell.Builder()
+                .boardType(type)
+                .value(6)
+                .build();
+
+        assertThatCellContainsValue(cell, 6);
     }
 
     private void assertThatCellContainsValue(Cell cell, int value) {
@@ -73,16 +63,17 @@ public class CellTest {
         assertThat(cell.getPossibilities()).isEmpty();
     }
 
-    private Cell createCell(int value) {
-        return new Cell.Builder()
-                .addAllValidValues(validValues)
+    private Cell createCell4x4(int value) {
+        return new ImmutableCell.Builder()
+                .boardType(Type.SQUARE_4X4)
                 .value(value)
                 .build();
     }
 
-    private Cell createEmptyCell() {
-        return new Cell.Builder()
-                .addAllValidValues(validValues)
+    private Cell createCell9x9(int value) {
+        return new ImmutableCell.Builder()
+                .boardType(Type.SQUARE_9X9)
+                .value(value)
                 .build();
     }
 }
