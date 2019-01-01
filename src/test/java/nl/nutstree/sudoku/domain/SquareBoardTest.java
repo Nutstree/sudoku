@@ -101,11 +101,23 @@ class SquareBoardTest {
     }
 
     @Test
-    public void toStringTest() {
+    public void toStringTest2() {
+        String expected = "Sudoku Board: \n" +
+                "[ ][1][ ]  [ ][2][ ]  [3][ ][ ]\n" +
+                "[ ][ ][4]  [ ][ ][5]  [ ][6][ ]\n" +
+                "[ ][7][ ]  [ ][ ][ ]  [ ][ ][8]\n" +
+                "\n" +
+                "[ ][ ][6]  [9][ ][ ]  [ ][7][ ]\n" +
+                "[ ][ ][ ]  [1][ ][ ]  [ ][ ][2]\n" +
+                "[ ][3][ ]  [ ][4][8]  [ ][ ][ ]\n" +
+                "\n" +
+                "[5][ ][ ]  [ ][ ][6]  [ ][4][ ]\n" +
+                "[ ][ ][ ]  [8][ ][ ]  [1][ ][6]\n" +
+                "[ ][ ][8]  [ ][ ][ ]  [ ][ ][ ]\n";
         board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
-
         System.out.println(board);
-        assertThat(board.toString()).contains(SquareBoard.BOARD_NAME);
+
+        assertThat(board.toString()).isEqualTo(expected);
     }
 
     @Test
