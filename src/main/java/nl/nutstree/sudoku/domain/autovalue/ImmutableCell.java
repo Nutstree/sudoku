@@ -1,10 +1,10 @@
 package nl.nutstree.sudoku.domain.autovalue;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Optional;
+import java.util.Set;
 
 @AutoValue
 public abstract class ImmutableCell implements Cell {
@@ -17,7 +17,7 @@ public abstract class ImmutableCell implements Cell {
 
     public abstract Optional<Integer> getValue();
 
-    public abstract ImmutableSet<Integer> getPossibilities();
+    public abstract Set<Integer> getPossibilities();
 
     private void validate() {
         getValue().ifPresentOrElse(this::validateValue,
@@ -36,7 +36,7 @@ public abstract class ImmutableCell implements Cell {
     public static Builder builder() {
         return new AutoValue_ImmutableCell.Builder()
                 .boardType(Type.SQUARE_9X9)
-                .possibilities(ImmutableSet.of());
+                .possibilities(Set.of());
     }
 
     @AutoValue.Builder
@@ -45,15 +45,19 @@ public abstract class ImmutableCell implements Cell {
 
         public abstract Builder value(int value);
 
-        public abstract Builder possibilities(ImmutableSet<Integer> possibilities);
+        public abstract Builder possibilities(Set<Integer> possibilities);
 
-        public abstract Builder possibilities(Integer... possibilities);
+        // Needed to implement it myself as autovalue doesn't handle this well
+        // When 'ImmutableSet' (guava) was used, it would be handled ok by autovalue
+        public Builder possibilities(Integer... possibilities) {
+            return possibilities(Set.of(possibilities));
+        }
 
         abstract Type getBoardType();
 
         abstract Optional<Integer> getValue();
 
-        abstract ImmutableSet<Integer> getPossibilities();
+        abstract Set<Integer> getPossibilities();
 
         abstract ImmutableCell autoBuild();  // not public
 
