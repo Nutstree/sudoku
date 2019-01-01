@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain;
+package nl.nutstree.sudoku.domain.immutables;
 
 public interface Location {
     int getRow();

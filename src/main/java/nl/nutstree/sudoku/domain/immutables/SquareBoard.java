@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain;
+package nl.nutstree.sudoku.domain.immutables;
 
 import org.apache.commons.lang3.Validate;
 
