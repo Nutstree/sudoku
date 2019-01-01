@@ -47,6 +47,27 @@ public class CellTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    public void validPossibilities() {
+        Cell cell = new ImmutableCell.Builder()
+                .boardType(Type.SQUARE_9X9)
+                .addPossibilities(9, 2, 4, 5, 6)
+                .build();
+
+        assertThat(cell.getPossibilities()).containsExactlyInAnyOrder(9, 2, 4, 5, 6);
+        assertThat(cell.getValue()).isEmpty();
+    }
+
+    @Test
+    public void invalidPossibilities() {
+        ImmutableCell.Builder cellBuilder = new ImmutableCell.Builder()
+                .boardType(Type.SQUARE_9X9)
+                .addPossibilities(0, 2, 4, 5, 6);
+
+        assertThatThrownBy(() -> cellBuilder.build())
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 
     @Test
     public void validValue() {
@@ -56,11 +77,7 @@ public class CellTest {
                 .value(6)
                 .build();
 
-        assertThatCellContainsValue(cell, 6);
-    }
-
-    private void assertThatCellContainsValue(Cell cell, int value) {
-        assertThat(cell.getValue()).contains(value);
+        assertThat(cell.getValue()).contains(6);
         assertThat(cell.getPossibilities()).isEmpty();
     }
 
