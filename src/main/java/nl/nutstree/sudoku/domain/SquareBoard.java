@@ -34,7 +34,8 @@ public class SquareBoard implements Board {
     public void setValue(int value, Location location) {
         validateLocation(location);
         ImmutableCell oldCell = (ImmutableCell) cellMap.get(location);
-        Cell newCell = oldCell.withValue(value);
+
+        Cell newCell = oldCell.clear().withValue(value);
 
         cellMap.put(location, newCell);
         Collection<Location> relatedLocations = getRelatedLocations(location);
