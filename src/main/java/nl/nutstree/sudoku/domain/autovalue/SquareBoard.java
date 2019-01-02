@@ -1,113 +1,67 @@
 package nl.nutstree.sudoku.domain.autovalue;
 
-import nl.nutstree.sudoku.domain.*;
+import com.google.auto.value.AutoValue;
+import nl.nutstree.sudoku.domain.Location;
+import nl.nutstree.sudoku.domain.Locations;
+import nl.nutstree.sudoku.domain.Type;
 import org.apache.commons.lang3.Validate;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SquareBoard implements Board {
+@AutoValue
+public abstract class SquareBoard implements Board {
     public static final String INVALID_LOCATION = "Location is made for a different board: %s, location: %s";
-    private final Map<Location, Cell> cellMap;
-    private final Type type;
     static final String BOARD_NAME = "Sudoku Board";
 
-    private SquareBoard(Type type, Map<Location, Cell> cellMap) {
-        this.type = type;
-        this.cellMap = cellMap;
-    }
+    abstract Type getType();
+
+    abstract Map<Location, ImmutableCell> getCellMap();
+
+    public abstract Locations getLocations();
 
     public int getSize() {
-        return type.getSize();
+        return getType().getSize();
+    }
+
+    private ImmutableCell getCell(Location location) {
+        validateLocation(location);
+        return getCellMap().get(location);
     }
 
     public Optional<Integer> getValue(Location location) {
-        validateLocation(location);
-        return cellMap.get(location).getValue();
+        return getCell(location).getValue();
     }
 
     public Collection<Integer> getPossibilities(Location location) {
-        validateLocation(location);
-        return cellMap.get(location).getPossibilities();
+        return getCell(location).getPossibilities();
     }
 
-    public void setValue(int value, Location location) {
-        validateLocation(location);
-        ImmutableCell oldCell = (ImmutableCell) cellMap.get(location);
+    public SquareBoard setValue(int value, Location location) {
+        ImmutableCell cellWithNewValue = getCell(location).withValue(value);
+        Map<Location, ImmutableCell> newCells = new LinkedHashMap<>(getCellMap());
 
-        Cell newCell = oldCell.withValue(value);
+        newCells.putAll(withoutPossibility(value, getLocations().getRelatedLocations(location)));
+        newCells.put(location, cellWithNewValue);
 
-        cellMap.put(location, newCell);
-        Collection<Location> relatedLocations = getRelatedLocations(location);
-        removePossibility(value, relatedLocations);
-    }
-
-    private void removePossibility(int possibility, Collection<Location> locations) {
-        locations.stream()
-                .forEach(location -> removePossibility(possibility, location));
-    }
-
-    private void removePossibility(int possibility, Location location) {
-        ImmutableCell cell = (ImmutableCell) cellMap.get(location);
-
-        Cell newCell = cell.withoutPossibility(possibility);
-
-        cellMap.put(location, newCell);
-    }
-
-    public Locations getLocations() {
-        return ImmutableLocations.builder()
-                .boardType(type)
-                .allLocations(cellMap.keySet())
+        return toBuilder()
+                .cellMap(newCells)
                 .build();
     }
 
-    public Collection<Location> getAllLocations() {
-        return Collections.unmodifiableSet(cellMap.keySet());
-    }
-
-    public Collection<Location> getLocationsInSameRow(Location referenceLocation) {
-        validateLocation(referenceLocation);
-
-        int row = referenceLocation.getRow();
-        return cellMap.keySet().stream()
-                .filter(location -> location.getRow() == row)
-                .collect(Collectors.toSet());
-    }
-
-    public Collection<Location> getLocationsInSameColumn(Location referenceLocation) {
-        validateLocation(referenceLocation);
-
-        int column = referenceLocation.getColumn();
-        return cellMap.keySet().stream()
-                .filter(location -> location.getColumn() == column)
-                .collect(Collectors.toSet());
-    }
-
-    public Collection<Location> getLocationsInSameQuadrant(Location referenceLocation) {
-        validateLocation(referenceLocation);
-
-        int quadrant = referenceLocation.getQuadrant();
-        return cellMap.keySet().stream()
-                .filter(location -> location.getQuadrant() == quadrant)
-                .collect(Collectors.toSet());
-    }
-
-    public Collection<Location> getRelatedLocations(Location referenceLocation) {
-        validateLocation(referenceLocation);
-
-        Collection<Location> relatedLocations = new HashSet<>();
-        relatedLocations.addAll(getLocationsInSameRow(referenceLocation));
-        relatedLocations.addAll(getLocationsInSameColumn(referenceLocation));
-        relatedLocations.addAll(getLocationsInSameQuadrant(referenceLocation));
-
-        return relatedLocations;
+    private Map<Location, ImmutableCell> withoutPossibility(int possibility, Collection<Location> locations) {
+        return locations.stream()
+                .collect(Collectors.toMap(location -> location,
+                        location -> getCell(location).withoutPossibility(possibility)));
     }
 
     void validateLocation(Location location) {
         Type typeOfLocation = ((ImmutableLocation) location).getBoardType();
-        Validate.isTrue(typeOfLocation == type, INVALID_LOCATION, type, location);
+        Validate.isTrue(typeOfLocation == getType(), INVALID_LOCATION, getType(), location);
     }
 
     @Override
@@ -133,69 +87,95 @@ public class SquareBoard implements Board {
         return stringBuilder.toString();
     }
 
-    public static class Factory {
-        static Map<Location, Cell> cellMap;
-        static Type type;
+    public abstract Builder toBuilder();
 
-        public static SquareBoard empty(Type boardType) {
-            type = boardType;
-            cellMap = new LinkedHashMap<>();
-            fillBoardWithEmptyCells();
+    public static Builder builder() {
+        return new AutoValue_SquareBoard.Builder()
+                .type(Type.SQUARE_9X9);
+    }
 
-            return new SquareBoard(type, cellMap);
-        }
+    public static SquareBoard of(String puzzle) {
+        return AutoValue_SquareBoard.builder()
+                .sudokuString(puzzle)
+                .build();
+    }
 
-        public static SquareBoard of(String puzzle) {
-            type = determineType(puzzle);
-            cellMap = new LinkedHashMap<>();
-            fillBoard(puzzle);
+    public static SquareBoard empty(Type type) {
+        return AutoValue_SquareBoard.builder()
+                .sudokuString(createEmptyPuzzleString(type))
+                .build();
+    }
 
-            return new SquareBoard(type, cellMap);
+    private static String createEmptyPuzzleString(Type type) {
+        return IntStream.range(0, type.getSize() * type.getSize())
+                .mapToObj(i -> "0")
+                .collect(Collectors.joining());
+    }
+
+
+    private static ImmutableCell createEmptyCell(Type type) {
+        return ImmutableCell.builder()
+                .boardType(type)
+                .build();
+    }
+
+    private static ImmutableCell createCell(Type type, int value) {
+        return ImmutableCell.builder()
+                .boardType(type)
+                .value(value)
+                .build();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        abstract Builder type(Type type);
+
+        abstract Builder cellMap(Map<Location, ImmutableCell> cellMap);
+
+        abstract Builder locations(Locations locations);
+
+        public Builder sudokuString(String puzzle) {
+            Type type = determineType(puzzle);
+            return AutoValue_SquareBoard.builder()
+                    .type(type)
+                    .locations(ImmutableLocations.of(type))
+                    .cellMap(createCellsFrom(puzzle));
+
         }
 
         private static Type determineType(String puzzle) {
             return Type.valueOf((int) Math.sqrt(puzzle.length()));
         }
 
-        private static void fillBoardWithEmptyCells() {
-            String emptyPuzzle = createEmptyPuzzleString();
-            fillBoard(emptyPuzzle);
-        }
+        private static Map<Location, ImmutableCell> createCellsFrom(String puzzle) {
+            Type type = determineType(puzzle);
+            Map<Location, ImmutableCell> cellMap = new LinkedHashMap<>();
 
-        private static String createEmptyPuzzleString() {
-            return IntStream.range(0, type.getSize() * type.getSize())
-                    .mapToObj(i -> "0")
-                    .collect(Collectors.joining());
-        }
-
-        private static void fillBoard(String puzzle) {
             for (int y = 0; y < type.getSize(); y++) {
                 for (int x = 0; x < type.getSize(); x++) {
                     Location location = ImmutableLocation.of(x, y);
                     int value = getValueFromPuzzleString(puzzle, x + (y * type.getSize()));
 
-                    Cell cell = value == 0 ? createEmptyCell() : createCell(value);
+                    ImmutableCell cell = value == 0 ? createEmptyCell(type) : createCell(type, value);
 
                     cellMap.put(location, cell);
                 }
             }
+
+            return Map.copyOf(cellMap);
         }
 
         private static int getValueFromPuzzleString(String puzzle, int stringPosition) {
             return Integer.valueOf(puzzle.substring(stringPosition, stringPosition + 1));
         }
 
-        private static Cell createEmptyCell() {
-            return ImmutableCell.builder()
-                    .boardType(type)
-                    .build();
-        }
+        abstract SquareBoard autoBuild();  // not public
 
-        private static Cell createCell(int value) {
-            return ImmutableCell.builder()
-                    .boardType(type)
-                    .value(value)
-                    .build();
+        public SquareBoard build() {
+            SquareBoard board = autoBuild();
+            //board.validate();
+
+            return board;
         }
     }
 }

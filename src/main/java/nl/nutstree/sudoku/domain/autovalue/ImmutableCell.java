@@ -37,7 +37,7 @@ public abstract class ImmutableCell implements Cell {
         Validate.isTrue(getBoardType().getValidValues().containsAll(getPossibilities()), INVALID_POSSIBILITY, getPossibilities());
     }
 
-    public Cell withValue(int value) {
+    public ImmutableCell withValue(int value) {
         return ImmutableCell.builder()
                 .boardType(this.getBoardType())
                 .possibilities(Collections.emptySet())
@@ -46,7 +46,7 @@ public abstract class ImmutableCell implements Cell {
     }
 
 
-    public Cell withoutPossibility(int possibility) {
+    public ImmutableCell withoutPossibility(int possibility) {
         HashSet<Integer> possibilities = new HashSet<>(getPossibilities());
         possibilities.remove(possibility);
 
@@ -85,7 +85,7 @@ public abstract class ImmutableCell implements Cell {
 
         abstract ImmutableCell autoBuild();  // not public
 
-        public Cell build() {
+        public ImmutableCell build() {
             if (getValue().isEmpty() && getPossibilities().isEmpty()) {
                 possibilities(getBoardType().getValidValues());
             }

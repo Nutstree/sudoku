@@ -14,8 +14,7 @@ class LocationsTest {
 
     @BeforeEach
     public void setUp() {
-        locations = SquareBoard.Factory.empty(Type.SQUARE_9X9)
-                .getLocations();
+        locations = ImmutableLocations.of(Type.SQUARE_9X9);
     }
 
     @Test

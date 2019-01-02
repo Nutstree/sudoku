@@ -17,7 +17,7 @@ class SquareBoardTest {
 
     @BeforeEach
     public void setUp() {
-        board = SquareBoard.Factory.empty(Type.SQUARE_9X9);
+        board = SquareBoard.empty(Type.SQUARE_9X9);
     }
 
     @Test
@@ -42,7 +42,7 @@ class SquareBoardTest {
 
     @Test
     public void constructBoardWithSudokuPuzzle_nonZeroFieldsCorrectlyFilled() {
-        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // 010020300
         assertThat(board.getValue(ImmutableLocation.of(1, 0))).contains(1);
@@ -88,7 +88,7 @@ class SquareBoardTest {
 
     @Test
     public void constructBoardWithSudokuPuzzle_zeroFieldsStillEmpty() {
-        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
 
         // random pick to check if fields are left empty
         assertThat(board.getValue(ImmutableLocation.of(0, 0))).isEmpty();
@@ -116,7 +116,7 @@ class SquareBoardTest {
                 "[5][ ][ ]  [ ][ ][6]  [ ][4][ ]\n" +
                 "[ ][ ][ ]  [8][ ][ ]  [1][ ][6]\n" +
                 "[ ][ ][8]  [ ][ ][ ]  [ ][ ][ ]\n";
-        board = SquareBoard.Factory.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
+        board = SquareBoard.of("010020300004005060070000008006900070000100002030048000500006040000800106008000000");
         System.out.println(board);
 
         assertThat(board.toString()).isEqualTo(expected);
@@ -152,9 +152,9 @@ class SquareBoardTest {
 
     private void assertSetValueCorrect(int value) {
         Location location = ImmutableLocation.of(6, 6);
-        board.setValue(value, location);
+        SquareBoard result = board.setValue(value, location);
 
-        assertThat(board.getValue(location)).contains(value);
+        assertThat(result.getValue(location)).contains(value);
     }
 
     @Test
@@ -163,19 +163,19 @@ class SquareBoardTest {
         Collection<Location> relatedLocations = board.getLocations().getRelatedLocations(location);
         Collection<Location> unrelatedLocations = getUnrelatedLocations(relatedLocations);
 
-        board.setValue(5, location);
+        Board result = board.setValue(5, location);
 
-        assertLocationsDoesNotContainPossibility(relatedLocations, 5);
+        assertLocationsDoesNotContainPossibility(result, relatedLocations, 5);
         assertOtherLocationsNotChanged(unrelatedLocations);
     }
 
-    private void assertLocationsDoesNotContainPossibility(Collection<Location> locations, int possibility) {
+    private void assertLocationsDoesNotContainPossibility(Board result, Collection<Location> locations, int possibility) {
         locations.stream()
-                .forEach(location -> assertLocationDoesNotContainPossibility(location, possibility));
+                .forEach(location -> assertLocationDoesNotContainPossibility(result, location, possibility));
     }
 
-    private void assertLocationDoesNotContainPossibility(Location location, int possibility) {
-        Collection<Integer> possibilities = board.getPossibilities(location);
+    private void assertLocationDoesNotContainPossibility(Board result, Location location, int possibility) {
+        Collection<Integer> possibilities = result.getPossibilities(location);
 
         assertThat(possibilities).doesNotContain(possibility);
     }

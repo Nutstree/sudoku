@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AutoValue
@@ -62,30 +63,18 @@ abstract class ImmutableLocations implements Locations {
         Validate.isTrue(typeOfLocation == getBoardType(), INVALID_LOCATION, getBoardType(), location);
     }
 
-    void validate() {
-
+    public static ImmutableLocations of(Type boardType) {
+        return new AutoValue_ImmutableLocations(boardType, createLocations(boardType));
     }
 
-
-    public static ImmutableLocations.Builder builder() {
-        return new AutoValue_ImmutableLocations.Builder()
-                .boardType(Type.SQUARE_9X9);
-    }
-
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract Builder boardType(Type type);
-
-        public abstract Builder allLocations(Collection<Location> locations);
-
-        abstract ImmutableLocations autoBuild();  // not public
-
-        public Locations build() {
-            ImmutableLocations locations = autoBuild();
-            locations.validate();
-
-            return locations;
+    private static Set<Location> createLocations(Type type) {
+        Set<Location> locations = new HashSet<>();
+        for (int y = 0; y < type.getSize(); y++) {
+            for (int x = 0; x < type.getSize(); x++) {
+                locations.add(ImmutableLocation.of(x, y));
+            }
         }
+
+        return locations;
     }
 }
