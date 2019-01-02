@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain.autovalue;
+package nl.nutstree.sudoku.domain;
 
 import com.google.common.collect.ImmutableSet;
 

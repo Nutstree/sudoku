@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain.autovalue;
+package nl.nutstree.sudoku.domain;
 
 import java.util.Collection;
 import java.util.Optional;

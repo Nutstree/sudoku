@@ -1,6 +1,8 @@
 package nl.nutstree.sudoku.domain.autovalue;
 
 import com.google.auto.value.AutoValue;
+import nl.nutstree.sudoku.domain.Cell;
+import nl.nutstree.sudoku.domain.Type;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Collections;

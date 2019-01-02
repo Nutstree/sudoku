@@ -1,5 +1,6 @@
 package nl.nutstree.sudoku.domain.autovalue;
 
+import nl.nutstree.sudoku.domain.*;
 import org.apache.commons.lang3.Validate;
 
 import java.util.*;

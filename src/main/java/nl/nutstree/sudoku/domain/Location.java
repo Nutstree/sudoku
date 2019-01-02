@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain.autovalue;
+package nl.nutstree.sudoku.domain;
 
 public interface Location {
     int getRow();

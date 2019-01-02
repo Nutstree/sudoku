@@ -1,5 +1,7 @@
 package nl.nutstree.sudoku.domain.autovalue;
 
+import nl.nutstree.sudoku.domain.Location;
+import nl.nutstree.sudoku.domain.Type;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

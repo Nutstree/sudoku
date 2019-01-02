@@ -1,5 +1,7 @@
 package nl.nutstree.sudoku.domain.immutables;
 
+import nl.nutstree.sudoku.domain.Cell;
+import nl.nutstree.sudoku.domain.Type;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

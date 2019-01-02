@@ -1,5 +1,8 @@
 package nl.nutstree.sudoku.domain.immutables;
 
+import nl.nutstree.sudoku.domain.Location;
+import nl.nutstree.sudoku.domain.Locations;
+import nl.nutstree.sudoku.domain.Type;
 import org.apache.commons.lang3.Validate;
 import org.immutables.value.Value;
 

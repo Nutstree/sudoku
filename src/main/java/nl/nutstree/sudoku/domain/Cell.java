@@ -1,4 +1,4 @@
-package nl.nutstree.sudoku.domain.immutables;
+package nl.nutstree.sudoku.domain;
 
 import java.util.Optional;
 import java.util.Set;

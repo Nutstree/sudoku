@@ -1,5 +1,7 @@
 package nl.nutstree.sudoku.domain.immutables;
 
+import nl.nutstree.sudoku.domain.Location;
+import nl.nutstree.sudoku.domain.Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
