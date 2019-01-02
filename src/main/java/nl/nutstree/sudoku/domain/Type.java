@@ -1,19 +1,18 @@
 package nl.nutstree.sudoku.domain;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 public enum Type {
-    SQUARE_4X4(4, ImmutableSet.of(1, 2, 3, 4)),
-    SQUARE_9X9(9, ImmutableSet.of(1, 2, 3, 4, 5, 6, 7, 8, 9));
+    SQUARE_4X4(4, Set.of(1, 2, 3, 4)),
+    SQUARE_9X9(9, Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
     public static final String INVALID_PUZZLE = "Puzzle string not valid!";
     private final int size;
-    private final ImmutableSet<Integer> validValues;
+    private final Set<Integer> validValues;
 
-    Type(int size, ImmutableSet<Integer> validValues) {
+    Type(int size, Set<Integer> validValues) {
         this.size = size;
         this.validValues = validValues;
     }
@@ -31,7 +30,7 @@ public enum Type {
         return size;
     }
 
-    public ImmutableSet<Integer> getValidValues() {
+    public Set<Integer> getValidValues() {
         return validValues;
     }
 }
