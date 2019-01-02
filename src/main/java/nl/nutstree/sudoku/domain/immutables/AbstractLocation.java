@@ -30,12 +30,11 @@ abstract class AbstractLocation implements Location {
     }
 
     @Value.Check
-    public void validate() {
+    void validate() {
         int maxSize = getBoardType().getSize() - 1;
 
         Validate.inclusiveBetween(0, maxSize, getRow(), ILLEGAL_ROW_NUMBER + getRow());
         Validate.inclusiveBetween(0, maxSize, getColumn(), ILLEGAL_COLUMN_NUMBER + getColumn());
-
     }
 
     public static Location of(Type type, int row, int column) {
