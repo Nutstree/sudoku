@@ -3,6 +3,8 @@ package nl.nutstree.sudoku.domain.autovalue;
 import com.google.auto.value.AutoValue;
 import org.apache.commons.lang3.Validate;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,6 +34,26 @@ public abstract class ImmutableCell implements Cell {
     private void validatePossibilities() {
         Validate.isTrue(getBoardType().getValidValues().containsAll(getPossibilities()), INVALID_POSSIBILITY, getPossibilities());
     }
+
+    public Cell withValue(int value) {
+        return ImmutableCell.builder()
+                .boardType(this.getBoardType())
+                .possibilities(Collections.emptySet())
+                .value(value)
+                .build();
+    }
+
+
+    public Cell withoutPossibility(int possibility) {
+        HashSet<Integer> possibilities = new HashSet<>(getPossibilities());
+        possibilities.remove(possibility);
+
+        return this.toBuilder()
+                .possibilities(possibilities)
+                .build();
+    }
+
+    public abstract Builder toBuilder();
 
     public static Builder builder() {
         return new AutoValue_ImmutableCell.Builder()
